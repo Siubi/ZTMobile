@@ -251,3 +251,7 @@ paket-files/
 # JetBrains Rider
 .idea/
 *.sln.iml
+
+# We ignore files from 'bin' and 'debug' subfolders
+bin/
+obj/
