@@ -11,7 +11,7 @@ namespace ZTMobile
     [Activity(Label = "ZTMobile", MainLauncher = true, Icon = "@drawable/icon")]
     public class MainActivity : Activity
     {
-        int count = 0;
+        int count = 50;
 
         protected override void OnCreate(Bundle bundle)
         {
