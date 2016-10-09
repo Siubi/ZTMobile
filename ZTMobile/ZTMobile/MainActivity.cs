@@ -47,7 +47,8 @@ namespace ZTMobile
         {
             progressBar.Visibility = ViewStates.Visible;
 
-            Thread thread = new Thread(ActLikeARequest);
+            //Turn on progress bar
+            Thread thread = new Thread(() => LoginRequest(e.Login, e.Password));
             thread.Start();
         }
 
@@ -66,13 +67,38 @@ namespace ZTMobile
         {
             progressBar.Visibility = ViewStates.Visible;
 
-            Thread thread = new Thread(ActLikeARequest);
+            //Turn on progress bar
+            Thread thread = new Thread(() => SignUpRequest(e.Login, e.Email, e.Password));
             thread.Start();
         }
 
-        private void ActLikeARequest()
+        private void LoginRequest(string login, string password)
         {
-            Thread.Sleep(2500);
+            if (FunctionsAndGlobals.LogInUserToDatabase(login, FunctionsAndGlobals.EncryptStringToMD5(password)) == true)
+            {
+                RunOnUiThread(() => { progressBar.Visibility = ViewStates.Invisible; });
+                //TODO: Go to main application window after LogIn
+            }
+            else
+            {
+                //TODO: Give information about failure (pop out window or text on the bottom)
+            }
+
+            RunOnUiThread(() => { progressBar.Visibility = ViewStates.Invisible; });
+        }
+
+        private void SignUpRequest(string login, string email, string password)
+        {
+            if (FunctionsAndGlobals.AddNewUserToDatabase(login, email, FunctionsAndGlobals.EncryptStringToMD5(password)) == true)
+            {
+                RunOnUiThread(() => { progressBar.Visibility = ViewStates.Invisible; });
+                //TODO: Pop out window with message about succesfull
+            }
+            else
+            {
+                //TODO: Pop out window with message about failure
+            }
+
             RunOnUiThread(() => { progressBar.Visibility = ViewStates.Invisible; });
         }
     }
