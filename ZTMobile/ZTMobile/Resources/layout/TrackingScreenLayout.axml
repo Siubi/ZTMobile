@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical"
+    android:background="#1a1a1a"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:minWidth="25px"
+    android:minHeight="25px">
+    <Button
+        android:layout_width="150dp"
+        android:layout_height="150dp"
+        android:background="@drawable/rounded_button"
+        android:gravity="center"
+        android:text="Start"
+        android:textColor="#fff"
+        android:layout_gravity="center"
+        android:id="@+id/buttonTrackTrace"
+        android:layout_marginTop="150dp" />
+    <EditText
+        android:layout_width="70dp"
+        android:layout_height="35dp"
+        android:id="@+id/txtLineNumber"
+        android:background="@drawable/edit_text_style"
+        android:hint="Numer linii"
+        android:paddingLeft="10dp"
+        android:textColor="#000"
+        android:layout_below="@id/buttonTrackTrace"
+        android:layout_marginTop="20dp"
+        android:layout_gravity="center" />
+</LinearLayout>

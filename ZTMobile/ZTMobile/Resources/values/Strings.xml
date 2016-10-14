@@ -2,4 +2,11 @@
 <resources>
     <string name="Hello">Hello World, Click Me!</string>
     <string name="ApplicationName">ZTMobile</string>
+    <string name="openDrawer">Drawer open</string>
+    <string name="closeDrawer">Drawer close</string>
+  <string name="signedIn">Zalogowano</string>
+  <string name="signedUp">Zarejestrowano pomyślnie</string>
+  <string name="signInError">Błąd logowania</string>
+  <string name="signUpError">Błąd rejestracji</string>
+  <string name="error">Błąd</string>
 </resources>

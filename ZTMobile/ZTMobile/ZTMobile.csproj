@@ -16,7 +16,7 @@
     <AndroidResgenFile>Resources\Resource.Designer.cs</AndroidResgenFile>
     <GenerateSerializationAssemblies>Off</GenerateSerializationAssemblies>
     <AndroidUseLatestPlatformSdk>True</AndroidUseLatestPlatformSdk>
-    <TargetFrameworkVersion>v6.0</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v7.0</TargetFrameworkVersion>
     <AndroidManifest>Properties\AndroidManifest.xml</AndroidManifest>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
@@ -51,10 +51,19 @@
     <Reference Include="System.Data" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Xml" />
+    <Reference Include="Xamarin.Android.Support.v4">
+      <HintPath>Libraries\Support.V7\lib\android\Xamarin.Android.Support.v4.dll</HintPath>
+    </Reference>
+    <Reference Include="Xamarin.Android.Support.v7.AppCompat">
+      <HintPath>Libraries\Support.V7\lib\android\Xamarin.Android.Support.v7.AppCompat.dll</HintPath>
+    </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="ActionBarDrawerToggle.cs" />
     <Compile Include="Dialog_SignIn.cs" />
     <Compile Include="Dialog_SignUp.cs" />
+    <Compile Include="Fragments\LoginScreen.cs" />
+    <Compile Include="Fragments\TrackingScreen.cs" />
     <Compile Include="FunctionsAndGlobals.cs" />
     <Compile Include="MainActivity.cs" />
     <Compile Include="Resources\Resource.Designer.cs" />
@@ -68,6 +77,12 @@
       <SubType>Designer</SubType>
     </AndroidResource>
     <AndroidResource Include="Resources\layout\dialog_SignIn.axml">
+      <SubType>Designer</SubType>
+    </AndroidResource>
+    <AndroidResource Include="Resources\layout\TrackingScreenLayout.axml">
+      <SubType>Designer</SubType>
+    </AndroidResource>
+    <AndroidResource Include="Resources\layout\LoginScreenLayout.axml">
       <SubType>Designer</SubType>
     </AndroidResource>
   </ItemGroup>
@@ -93,6 +108,16 @@
   </ItemGroup>
   <ItemGroup>
     <AndroidResource Include="Resources\drawable\edit_text_style.xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <AndroidResource Include="Resources\drawable\rounded_button.xml">
+      <SubType>Designer</SubType>
+    </AndroidResource>
+  </ItemGroup>
+  <ItemGroup>
+    <AndroidResource Include="Resources\values\Styles.xml">
+      <SubType>Designer</SubType>
+    </AndroidResource>
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath)\Xamarin\Android\Xamarin.Android.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
