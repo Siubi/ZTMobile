@@ -41,10 +41,14 @@ namespace ZTMobile.Fragments
         {
             if (isTrackingEnabled == false)
             {
+                buttonTrackingTrace.Text = "Stop";
+                buttonTrackingTrace.SetBackgroundResource(Resource.Drawable.rounded_button_stop);
                 isTrackingEnabled = true;
             }
             else
             {
+                buttonTrackingTrace.Text = "Start";
+                buttonTrackingTrace.SetBackgroundResource(Resource.Drawable.rounded_button);
                 isTrackingEnabled = false;
             }
         }
