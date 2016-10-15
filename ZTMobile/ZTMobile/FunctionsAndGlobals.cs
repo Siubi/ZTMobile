@@ -49,7 +49,7 @@ namespace ZTMobile
         //Password should be already encrypted by MD5
         public static Boolean AddNewUserToDatabase(string userName, string email, string password)
         {
-            MySqlConnection connection = new MySqlConnection("SERVER=sql7.freemysqlhosting.net;PORT=3306;DATABASE=sql7139362;UID=sql7139362;PWD=imMWqDDFgY;");
+            MySqlConnection connection = new MySqlConnection("SERVER=db4free.net;PORT=3306;DATABASE=ztmobile;UID=ztmobile;PWD=admin123;");
             MySqlCommand command;
             string query;
             Boolean result;
@@ -57,14 +57,13 @@ namespace ZTMobile
             try
             {
                 connection.Open();
-                query = "INSERT INTO Users(Login,Email,Password,LoggedIn,LastLoginDate) VALUES(@user,@email,@password,@loggedIn,@lastLoginDate)";
+                query = "INSERT INTO Users(Login,Email,Password,LoggedIn) VALUES(@user,@email,@password,@loggedIn)";
 
                 command = new MySqlCommand(query, connection);
                 command.Parameters.AddWithValue("@user", userName);
                 command.Parameters.AddWithValue("@email", email);
                 command.Parameters.AddWithValue("@password", password);
                 command.Parameters.AddWithValue("@loggedIn", "0");
-                command.Parameters.AddWithValue("@lastLoginDate", "NULL");
                 command.ExecuteNonQuery();
                 command.Parameters.Clear();
                 result = true;
@@ -84,7 +83,7 @@ namespace ZTMobile
         //Password should be already encrypted by MD5
         public static Boolean LogInUserToDatabase(string userName, string password)
         {
-            MySqlConnection connection = new MySqlConnection("SERVER=sql7.freemysqlhosting.net;PORT=3306;DATABASE=sql7139362;UID=sql7139362;PWD=imMWqDDFgY;");
+            MySqlConnection connection = new MySqlConnection("SERVER=db4free.net;PORT=3306;DATABASE=ztmobile;UID=ztmobile;PWD=admin123;");
             MySqlCommand command;
             MySqlDataReader receivedResponse;
             string query;
