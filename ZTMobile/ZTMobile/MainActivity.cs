@@ -62,6 +62,7 @@ namespace ZTMobile
 
             drawerLayout.SetDrawerListener(drawerToggle);
             SupportActionBar.SetHomeButtonEnabled(true);
+            SupportActionBar.SetDisplayHomeAsUpEnabled(true);
             SupportActionBar.SetDisplayShowTitleEnabled(true);
             drawerToggle.SyncState();
 
