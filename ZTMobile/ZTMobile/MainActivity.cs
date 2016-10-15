@@ -6,15 +6,28 @@ using Android.Views;
 using Android.Widget;
 using Android.OS;
 using System.Threading;
+using Android.Support.V7.App;
+using SupportToolbar = Android.Support.V7.Widget.Toolbar;
+using Android.Support.V4.Widget;
+using System.Collections.Generic;
+using ZTMobile.Fragments;
+using SupportFragment = Android.Support.V4.App.Fragment;
 
 namespace ZTMobile
 {
-    [Activity(Label = "ZTMobile", MainLauncher = true, Icon = "@drawable/icon")]
-    public class MainActivity : Activity
+    [Activity(Label = "ZTMobile", MainLauncher = true, Icon = "@drawable/icon", Theme = "@style/MainTheme")]
+    public class MainActivity : ActionBarActivity
     {
-        private Button buttonSignUp;
-        private Button buttonSignIn;
-        private ProgressBar progressBar;
+        private SupportToolbar toolbar;
+        private ActionBarDrawerToggle drawerToggle;
+        private DrawerLayout drawerLayout;
+        private ListView leftDrawer;
+        private SupportFragment currentFragment;
+        private TrackingScreen trackingScreenFragment;
+        private LoginScreen loginScreenFragment;
+
+        List<String> leftMenuItems = new List<String>();
+        ArrayAdapter leftMenuArrayAdapter;
 
         protected override void OnCreate(Bundle bundle)
         {
@@ -23,83 +36,69 @@ namespace ZTMobile
             // Set our view from the "main" layout resource
             SetContentView(Resource.Layout.Main);
 
-            progressBar = FindViewById<ProgressBar>(Resource.Id.progressBarLoginScreen);
-            buttonSignUp = FindViewById<Button>(Resource.Id.buttonSignUp);
-            buttonSignIn = FindViewById<Button>(Resource.Id.buttonSignIn);
+            toolbar = FindViewById<SupportToolbar>(Resource.Id.toolbar);
+            drawerLayout = FindViewById<DrawerLayout>(Resource.Id.drawer_layout);
+            leftDrawer = FindViewById<ListView>(Resource.Id.left_drawer);
 
-            //We want to pop out new windows on clicks
-            buttonSignUp.Click += ButtonSignUp_Click;
-            buttonSignIn.Click += ButtonSignIn_Click;
+            leftMenuItems.Add("Śledzenie");
+            leftMenuItems.Add("Konto");
+            leftMenuArrayAdapter = new ArrayAdapter(this, Android.Resource.Layout.SimpleListItem1, leftMenuItems);
+            leftDrawer.Adapter = leftMenuArrayAdapter;
+
+            SetSupportActionBar(toolbar);
+
+            trackingScreenFragment = new TrackingScreen();
+            loginScreenFragment = new LoginScreen();
+
+            var transaction = SupportFragmentManager.BeginTransaction();
+            transaction.Add(Resource.Id.fragmentContainer, loginScreenFragment, "Login Screen");
+            transaction.Hide(loginScreenFragment);
+            transaction.Add(Resource.Id.fragmentContainer, trackingScreenFragment, "Tracking Screen");
+            transaction.Commit();
+
+            currentFragment = trackingScreenFragment;
+
+            drawerToggle = new ActionBarDrawerToggle(this, drawerLayout, Resource.String.openDrawer, Resource.String.closeDrawer);
+
+            drawerLayout.SetDrawerListener(drawerToggle);
+            SupportActionBar.SetHomeButtonEnabled(true);
+            SupportActionBar.SetDisplayShowTitleEnabled(true);
+            drawerToggle.SyncState();
+
+            leftDrawer.ItemClick += LeftDrawer_ItemClick;
         }
 
-        private void ButtonSignIn_Click(object sender, EventArgs e)
+        private void LeftDrawer_ItemClick(object sender, AdapterView.ItemClickEventArgs e)
         {
-            FragmentTransaction transaction = FragmentManager.BeginTransaction();
-
-            //Class 'Dialog_SignIn' contains code for window that will pop out
-            Dialog_SignIn signInDialog = new Dialog_SignIn();
-            signInDialog.Show(transaction, "SignIn fragment transaction");
-
-            signInDialog.mOnSignInComplete += SignInDialog_mOnSignInComplete;
-        }
-
-        private void SignInDialog_mOnSignInComplete(object sender, OnSignInEventArgs e)
-        {
-            progressBar.Visibility = ViewStates.Visible;
-
-            //Turn on progress bar
-            Thread thread = new Thread(() => LoginRequest(e.Login, e.Password));
-            thread.Start();
-        }
-
-        private void ButtonSignUp_Click(object sender, EventArgs e)
-        {
-            FragmentTransaction transaction = FragmentManager.BeginTransaction();
-
-            //Class 'Dialog_SignUp' contains code for window that will pop out
-            Dialog_SignUp signUpDialog = new Dialog_SignUp();
-            signUpDialog.Show(transaction, "SignUp fragment transaction");
-
-            signUpDialog.mOnSignUpComplete += SignUpDialog_mOnSignUpComplete;
-        }
-
-        private void SignUpDialog_mOnSignUpComplete(object sender, OnSignUpEventArgs e)
-        {
-            progressBar.Visibility = ViewStates.Visible;
-
-            //Turn on progress bar
-            Thread thread = new Thread(() => SignUpRequest(e.Login, e.Email, e.Password));
-            thread.Start();
-        }
-
-        private void LoginRequest(string login, string password)
-        {
-            if (FunctionsAndGlobals.LogInUserToDatabase(login, FunctionsAndGlobals.EncryptStringToMD5(password)) == true)
+            //Tracking Screen
+            if (e.Position == 0)
             {
-                RunOnUiThread(() => { progressBar.Visibility = ViewStates.Invisible; });
-                //TODO: Go to main application window after LogIn
+                ShowFragment(trackingScreenFragment);
             }
-            else
+            //Login Screen
+            if (e.Position == 1)
             {
-                //TODO: Give information about failure (pop out window or text on the bottom)
+                ShowFragment(loginScreenFragment);
             }
 
-            RunOnUiThread(() => { progressBar.Visibility = ViewStates.Invisible; });
+            drawerLayout.CloseDrawer(Android.Support.V4.View.GravityCompat.Start);
         }
 
-        private void SignUpRequest(string login, string email, string password)
+        public override bool OnOptionsItemSelected(IMenuItem item)
         {
-            if (FunctionsAndGlobals.AddNewUserToDatabase(login, email, FunctionsAndGlobals.EncryptStringToMD5(password)) == true)
-            {
-                RunOnUiThread(() => { progressBar.Visibility = ViewStates.Invisible; });
-                //TODO: Pop out window with message about succesfull
-            }
-            else
-            {
-                //TODO: Pop out window with message about failure
-            }
+            drawerToggle.OnOptionsItemSelected(item);
+            return base.OnOptionsItemSelected(item);
+        }
 
-            RunOnUiThread(() => { progressBar.Visibility = ViewStates.Invisible; });
+        private void ShowFragment(SupportFragment fragment)
+        {
+            var transaction = SupportFragmentManager.BeginTransaction();
+            transaction.Hide(currentFragment);
+            transaction.Show(fragment);
+            transaction.AddToBackStack(null);
+            transaction.Commit();
+
+            currentFragment = fragment;
         }
     }
 }
