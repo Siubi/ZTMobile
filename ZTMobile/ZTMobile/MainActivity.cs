@@ -17,7 +17,7 @@ using Android.Gms.Maps;
 
 namespace ZTMobile
 {
-    [Activity(Label = "ZTMobile", MainLauncher = true, Icon = "@drawable/icon", Theme = "@style/MainTheme")]
+    [Activity(Label = "ZTMobile", MainLauncher = true, Icon = "@drawable/icon", Theme = "@style/MainTheme", ScreenOrientation = Android.Content.PM.ScreenOrientation.Portrait)]
     public class MainActivity : ActionBarActivity
     {
         private SupportToolbar toolbar;
@@ -28,6 +28,7 @@ namespace ZTMobile
         private TrackingScreen trackingScreenFragment;
         private LoginScreen loginScreenFragment;
         private MapScreen mapScreenFragment;
+        private DateTime lastBackButtonClickTime;
 
         List<String> leftMenuItems = new List<String>();
         ArrayAdapter leftMenuArrayAdapter;
@@ -35,6 +36,8 @@ namespace ZTMobile
         protected override void OnCreate(Bundle bundle)
         {
             base.OnCreate(bundle);
+
+            lastBackButtonClickTime = DateTime.Now;
 
             // Set our view from the "main" layout resource
             SetContentView(Resource.Layout.Main);
@@ -108,6 +111,18 @@ namespace ZTMobile
         {
             drawerToggle.OnOptionsItemSelected(item);
             return base.OnOptionsItemSelected(item);
+        }
+
+        public override void OnBackPressed()
+        {
+            DateTime pressTime = DateTime.Now;
+            if ((pressTime - lastBackButtonClickTime).TotalMilliseconds <= FunctionsAndGlobals.doubleBackButtonClickInterval_ms)
+            {
+                Java.Lang.JavaSystem.Exit(0);
+            }
+
+            Toast.MakeText(this, Resource.String.exitMessage, ToastLength.Short).Show();
+            lastBackButtonClickTime = pressTime;
         }
 
         private void ShowFragment(SupportFragment fragment)
