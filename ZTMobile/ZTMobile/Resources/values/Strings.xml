@@ -9,4 +9,5 @@
   <string name="signInError">Błąd logowania</string>
   <string name="signUpError">Błąd rejestracji</string>
   <string name="error">Błąd</string>
+  <string name="google_maps_key">AIzaSyCOn0hObnk48JpqWOb-EhAzXRbLzdYYs84</string>
 </resources>
