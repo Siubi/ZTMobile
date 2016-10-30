@@ -42,6 +42,8 @@ namespace ZTMobile
             // Set our view from the "main" layout resource
             SetContentView(Resource.Layout.Main);
 
+            lastBackButtonClickTime = DateTime.Now;
+
             toolbar = FindViewById<SupportToolbar>(Resource.Id.toolbar);
             drawerLayout = FindViewById<DrawerLayout>(Resource.Id.drawer_layout);
             leftDrawer = FindViewById<ListView>(Resource.Id.left_drawer);
