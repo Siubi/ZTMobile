@@ -2546,7 +2546,10 @@ namespace ZTMobile
 			public const int error = 2131165245;
 			
 			// aapt resource value: 0x7f07003e
-			public const int google_maps_key = 2131165246;
+			public const int exitMessage = 2131165246;
+			
+			// aapt resource value: 0x7f07003f
+			public const int google_maps_key = 2131165247;
 			
 			// aapt resource value: 0x7f070037
 			public const int openDrawer = 2131165239;

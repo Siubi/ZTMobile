@@ -33,6 +33,7 @@
         android:layout_height="0dp"
         android:layout_weight="15"
         android:textSize="25sp"
+        android:textColor="#adad85"
         android:id="@+id/txrOr"
         android:gravity="center" />
     <Button
