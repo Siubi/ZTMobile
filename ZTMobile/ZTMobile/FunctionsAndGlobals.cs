@@ -21,6 +21,7 @@ namespace ZTMobile
     {
         public static GoogleMap googleMap;
         public static bool isTrackingEnabled;
+        public static long doubleBackButtonClickInterval_ms = 2000;
 
         public static string GetCurrentDateFromTheInternet()
         {

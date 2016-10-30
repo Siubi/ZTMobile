@@ -2149,6 +2149,9 @@ namespace ZTMobile
 			// aapt resource value: 0x7f0b005f
 			public const int txtEmailSignUp = 2131427423;
 			
+			// aapt resource value: 0x7f0b0063
+			public const int txtGuestName = 2131427427;
+			
 			// aapt resource value: 0x7f0b0083
 			public const int txtLineNumber = 2131427459;
 			
@@ -2166,9 +2169,6 @@ namespace ZTMobile
 			
 			// aapt resource value: 0x7f0b0060
 			public const int txtPasswordSignUp = 2131427424;
-			
-			// aapt resource value: 0x7f0b0063
-			public const int txtZTMobile = 2131427427;
 			
 			// aapt resource value: 0x7f0b0008
 			public const int up = 2131427336;
@@ -2546,7 +2546,10 @@ namespace ZTMobile
 			public const int error = 2131165245;
 			
 			// aapt resource value: 0x7f07003e
-			public const int google_maps_key = 2131165246;
+			public const int exitMessage = 2131165246;
+			
+			// aapt resource value: 0x7f07003f
+			public const int google_maps_key = 2131165247;
 			
 			// aapt resource value: 0x7f070037
 			public const int openDrawer = 2131165239;
