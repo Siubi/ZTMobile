@@ -16,7 +16,6 @@ namespace ZTMobile.Fragments
     public class TrackingScreen : Android.Support.V4.App.Fragment
     {
         private Button buttonTrackingTrace;
-        private bool isTrackingEnabled;
 
         public override void OnCreate(Bundle savedInstanceState)
         {
@@ -30,7 +29,7 @@ namespace ZTMobile.Fragments
             View view = inflater.Inflate(Resource.Layout.TrackingScreenLayout, container, false);
 
             buttonTrackingTrace = view.FindViewById<Button>(Resource.Id.buttonTrackTrace);
-            isTrackingEnabled = false;
+            FunctionsAndGlobals.isTrackingEnabled = false;
 
             buttonTrackingTrace.Click += ButtonTrackingTrace_Click;
 
@@ -39,17 +38,19 @@ namespace ZTMobile.Fragments
 
         private void ButtonTrackingTrace_Click(object sender, EventArgs e)
         {
-            if (isTrackingEnabled == false)
+            if (FunctionsAndGlobals.isTrackingEnabled == false)
             {
                 buttonTrackingTrace.Text = "Stop";
                 buttonTrackingTrace.SetBackgroundResource(Resource.Drawable.rounded_button_stop);
-                isTrackingEnabled = true;
+                FunctionsAndGlobals.isTrackingEnabled = true;
+                FunctionsAndGlobals.googleMap.MyLocationEnabled = true;
             }
             else
             {
                 buttonTrackingTrace.Text = "Start";
                 buttonTrackingTrace.SetBackgroundResource(Resource.Drawable.rounded_button);
-                isTrackingEnabled = false;
+                FunctionsAndGlobals.isTrackingEnabled = false;
+                FunctionsAndGlobals.googleMap.MyLocationEnabled = false;
             }
         }
     }

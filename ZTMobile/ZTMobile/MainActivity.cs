@@ -12,6 +12,8 @@ using Android.Support.V4.Widget;
 using System.Collections.Generic;
 using ZTMobile.Fragments;
 using SupportFragment = Android.Support.V4.App.Fragment;
+using Android.Gms.Maps.Model;
+using Android.Gms.Maps;
 
 namespace ZTMobile
 {
@@ -25,6 +27,7 @@ namespace ZTMobile
         private SupportFragment currentFragment;
         private TrackingScreen trackingScreenFragment;
         private LoginScreen loginScreenFragment;
+        private MapScreen mapScreenFragment;
 
         List<String> leftMenuItems = new List<String>();
         ArrayAdapter leftMenuArrayAdapter;
@@ -42,6 +45,7 @@ namespace ZTMobile
 
             leftMenuItems.Add("Śledzenie");
             leftMenuItems.Add("Konto");
+            leftMenuItems.Add("Mapa");
             leftMenuArrayAdapter = new ArrayAdapter(this, Android.Resource.Layout.SimpleListItem1, leftMenuItems);
             leftDrawer.Adapter = leftMenuArrayAdapter;
 
@@ -49,8 +53,11 @@ namespace ZTMobile
 
             trackingScreenFragment = new TrackingScreen();
             loginScreenFragment = new LoginScreen();
+            mapScreenFragment = new MapScreen();
 
             var transaction = SupportFragmentManager.BeginTransaction();
+            transaction.Add(Resource.Id.fragmentContainer, mapScreenFragment, "Map Screen");
+            transaction.Hide(loginScreenFragment);
             transaction.Add(Resource.Id.fragmentContainer, loginScreenFragment, "Login Screen");
             transaction.Hide(loginScreenFragment);
             transaction.Add(Resource.Id.fragmentContainer, trackingScreenFragment, "Tracking Screen");
@@ -80,6 +87,18 @@ namespace ZTMobile
             if (e.Position == 1)
             {
                 ShowFragment(loginScreenFragment);
+            }
+            //Map Screen
+            if (e.Position == 2)
+            {
+                if (FunctionsAndGlobals.isTrackingEnabled == true)
+                {
+                    LatLng latLng = new LatLng(FunctionsAndGlobals.googleMap.MyLocation.Latitude, FunctionsAndGlobals.googleMap.MyLocation.Longitude);
+                    CameraUpdate cameraUpdate = CameraUpdateFactory.NewLatLngZoom(latLng, 16);
+                    FunctionsAndGlobals.googleMap.AnimateCamera(cameraUpdate);
+                }
+
+                ShowFragment(mapScreenFragment);
             }
 
             drawerLayout.CloseDrawer(Android.Support.V4.View.GravityCompat.Start);

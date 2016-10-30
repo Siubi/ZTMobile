@@ -13,11 +13,15 @@ using System.Data;
 using MySql.Data.MySqlClient;
 using System.Net;
 using System.Globalization;
+using Android.Gms.Maps;
 
 namespace ZTMobile
 {
     public class FunctionsAndGlobals
     {
+        public static GoogleMap googleMap;
+        public static bool isTrackingEnabled;
+
         public static string GetCurrentDateFromTheInternet()
         {
             var myHttpWebRequest = (HttpWebRequest)WebRequest.Create("http://www.microsoft.com");
