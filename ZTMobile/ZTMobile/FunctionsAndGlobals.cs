@@ -20,7 +20,9 @@ namespace ZTMobile
     public class FunctionsAndGlobals
     {
         public static GoogleMap googleMap;
-        public static bool isTrackingEnabled;
+        public static string userName = "";
+        public static bool isTrackingEnabled = false;
+        public static bool isUserLoggedIn = false;
         public static long doubleBackButtonClickInterval_ms = 2000;
 
         public static string GetCurrentDateFromTheInternet()
@@ -113,6 +115,61 @@ namespace ZTMobile
                     if (userName == receivedLogin && password == receivedPassword)
                     {
                         query = "UPDATE Users SET LoggedIn=1, LastLoginDate='" + GetCurrentDateFromTheInternet() + "' WHERE Login='" + userName + "'";
+                        command.CommandText = query;
+                        command.ExecuteNonQuery();
+                        result = true;
+                    }
+                    else
+                    {
+                        result = false;
+                    }
+                }
+                else
+                {
+                    //User does not exist
+                    result = false;
+                }
+
+
+            }
+            catch (Exception ex)
+            {
+                result = false;
+            }
+            finally
+            {
+                connection.Close();
+            }
+
+            return result;
+        }
+
+        //Password should be already encrypted by MD5
+        public static Boolean LogOutUserFromDatabase(string userName)
+        {
+            MySqlConnection connection = new MySqlConnection("SERVER=db4free.net;PORT=3306;DATABASE=ztmobile;UID=ztmobile;PWD=admin123;");
+            MySqlCommand command;
+            MySqlDataReader receivedResponse;
+            string query;
+            string receivedLogin;
+            Boolean result;
+
+            try
+            {
+                connection.Open();
+                query = "SELECT * FROM Users WHERE Login='" + userName + "'";
+
+                command = new MySqlCommand(query, connection);
+                receivedResponse = command.ExecuteReader();
+
+                if (receivedResponse.Read())
+                {
+                    receivedLogin = receivedResponse.GetString("Login");
+                    receivedResponse.Close();
+
+                    if (userName == receivedLogin)
+                    {
+                        query = "UPDATE Users SET LoggedIn=0 WHERE Login='" + userName + "'";
                         command.CommandText = query;
                         command.ExecuteNonQuery();
                         result = true;

@@ -90,6 +90,7 @@
     <Compile Include="ActionBarDrawerToggle.cs" />
     <Compile Include="Dialog_SignIn.cs" />
     <Compile Include="Dialog_SignUp.cs" />
+    <Compile Include="Fragments\AccountScreen.cs" />
     <Compile Include="Fragments\LoginScreen.cs" />
     <Compile Include="Fragments\MapScreen.cs" />
     <Compile Include="Fragments\TrackingScreen.cs" />
@@ -116,6 +117,9 @@
       <SubType>Designer</SubType>
     </AndroidResource>
     <AndroidResource Include="Resources\layout\MapScreenLayout.axml">
+      <SubType>Designer</SubType>
+    </AndroidResource>
+    <AndroidResource Include="Resources\layout\AccountScreenLayout.axml">
       <SubType>Designer</SubType>
     </AndroidResource>
   </ItemGroup>

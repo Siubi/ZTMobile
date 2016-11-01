@@ -28,6 +28,7 @@ namespace ZTMobile
         private TrackingScreen trackingScreenFragment;
         private LoginScreen loginScreenFragment;
         private MapScreen mapScreenFragment;
+        private AccountScreen accountScreenFragment;
         private DateTime lastBackButtonClickTime;
 
         List<String> leftMenuItems = new List<String>();
@@ -59,10 +60,13 @@ namespace ZTMobile
             trackingScreenFragment = new TrackingScreen();
             loginScreenFragment = new LoginScreen();
             mapScreenFragment = new MapScreen();
+            accountScreenFragment = new AccountScreen();
 
             var transaction = SupportFragmentManager.BeginTransaction();
+            transaction.Add(Resource.Id.fragmentContainer, accountScreenFragment, "Account Screen");
+            transaction.Hide(accountScreenFragment);
             transaction.Add(Resource.Id.fragmentContainer, mapScreenFragment, "Map Screen");
-            transaction.Hide(loginScreenFragment);
+            transaction.Hide(mapScreenFragment);
             transaction.Add(Resource.Id.fragmentContainer, loginScreenFragment, "Login Screen");
             transaction.Hide(loginScreenFragment);
             transaction.Add(Resource.Id.fragmentContainer, trackingScreenFragment, "Tracking Screen");
@@ -79,7 +83,28 @@ namespace ZTMobile
             drawerToggle.SyncState();
 
             leftDrawer.ItemClick += LeftDrawer_ItemClick;
+            loginScreenFragment.LoggedInSuccessfully += LoginScreenFragment_LoggedInSuccessfully;
+            accountScreenFragment.LoggedOutSuccessfully += AccountScreenFragment_LoggedOutSuccessfully;
+            
         }
+        
+        private void LoginScreenFragment_LoggedInSuccessfully()
+        {
+            if (currentFragment == loginScreenFragment)
+            {
+                this.RunOnUiThread(() => { accountScreenFragment.ChangeVisibleUserName(FunctionsAndGlobals.userName); });
+                ShowFragment(accountScreenFragment);
+            }
+        }
+
+        private void AccountScreenFragment_LoggedOutSuccessfully()
+        {
+            if (currentFragment == accountScreenFragment)
+            {
+                ShowFragment(loginScreenFragment);
+            }
+        }
+
 
         private void LeftDrawer_ItemClick(object sender, AdapterView.ItemClickEventArgs e)
         {
@@ -91,7 +116,14 @@ namespace ZTMobile
             //Login Screen
             if (e.Position == 1)
             {
-                ShowFragment(loginScreenFragment);
+                if (FunctionsAndGlobals.isUserLoggedIn == true)
+                {
+                    ShowFragment(accountScreenFragment);
+                }
+                else
+                {
+                    ShowFragment(loginScreenFragment);
+                }
             }
             //Map Screen
             if (e.Position == 2)

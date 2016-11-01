@@ -21,6 +21,9 @@ namespace ZTMobile.Fragments
         private Button buttonSignUp;
         private Button buttonSignIn;
         private ProgressBar progressBar;
+        private TextView txtGuestName;
+
+        public event Action LoggedInSuccessfully;
 
         public override void OnCreate(Bundle savedInstanceState)
         {
@@ -29,11 +32,16 @@ namespace ZTMobile.Fragments
 
         public override View OnCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
         {
+            Random rnd = new Random();
             View view = inflater.Inflate(Resource.Layout.LoginScreenLayout, container, false);
 
+            txtGuestName = view.FindViewById<TextView>(Resource.Id.txtGuestName);
             progressBar = view.FindViewById<ProgressBar>(Resource.Id.progressBarLoginScreen);
             buttonSignUp = view.FindViewById<Button>(Resource.Id.buttonSignUp);
             buttonSignIn = view.FindViewById<Button>(Resource.Id.buttonSignIn);
+
+            //generate random ID for guest
+            txtGuestName.Text = "Guest" + rnd.Next(10000, 99999).ToString();
 
             //We want to pop out new windows on clicks
             buttonSignUp.Click += ButtonSignUp_Click;
@@ -94,6 +102,9 @@ namespace ZTMobile.Fragments
             {
                 Activity.RunOnUiThread(() => { progressBar.Visibility = ViewStates.Invisible; });
                 Activity.RunOnUiThread(() => { Toast.MakeText(Activity.ApplicationContext, Resource.String.signedIn, ToastLength.Short).Show(); });
+                FunctionsAndGlobals.userName = login;
+                FunctionsAndGlobals.isUserLoggedIn = true;
+                LoggedInSuccessfully();
             }
             else
             {
