@@ -14,25 +14,41 @@ using MySql.Data.MySqlClient;
 using System.Net;
 using System.Globalization;
 using Android.Gms.Maps;
+using System.IO;
+using System.Timers;
+using System.Threading;
 
 namespace ZTMobile
 {
     public class FunctionsAndGlobals
     {
+        enum DateFormats { Date, Time, DateAndTime }
+
         public static GoogleMap googleMap;
         public static string userName = "";
+        public static string guestID = "";
         public static bool isTrackingEnabled = false;
         public static bool isUserLoggedIn = false;
         public static long doubleBackButtonClickInterval_ms = 2000;
 
-        public static string GetCurrentDateFromTheInternet()
+        private static int timeIntervalBetweenGPSDataSaves = 1000;
+        private static String fileNameWithGPSData;
+
+        public static string GetCurrentDateFromTheInternet(int dateFormat)
         {
             var myHttpWebRequest = (HttpWebRequest)WebRequest.Create("http://www.microsoft.com");
             var response = myHttpWebRequest.GetResponse();
             string todaysDates = response.Headers["date"];
             DateTime dateTime = DateTime.ParseExact(todaysDates, "ddd, dd MMM yyyy HH:mm:ss 'GMT'", CultureInfo.InvariantCulture.DateTimeFormat, DateTimeStyles.AssumeUniversal);
 
-            return dateTime.ToString("yyyy-MM-dd");
+            if (dateFormat == (int)DateFormats.Date)
+                return dateTime.ToString("yyyy-MM-dd");
+            else if (dateFormat == (int)DateFormats.Time)
+                return dateTime.ToString("HH:mm:ss");
+            else if (dateFormat == (int)DateFormats.DateAndTime)
+                return dateTime.ToString("yyyy-MM-dd HH:mm:ss");
+            else
+                return null;
         }
 
         public static string EncryptStringToMD5(string input)
@@ -50,6 +66,38 @@ namespace ZTMobile
                     sb.Append(hashBytes[i].ToString("X2"));
                 }
                 return sb.ToString();
+            }
+        }
+
+        public static void WriteToFile(string fileName, string text)
+        {
+            string path = Android.OS.Environment.ExternalStorageDirectory.AbsolutePath;
+            string filePath = System.IO.Path.Combine(path, fileName);
+            StreamWriter stream = new StreamWriter(filePath, true);
+            stream.WriteLine(text);
+            stream.Close();
+        }
+
+        public static void SaveGPSDataToFile(string busNumber, string busDriverID)
+        {
+            String currentDateAndTime = GetCurrentDateFromTheInternet((int)DateFormats.DateAndTime);
+            String header = "<Numer autobusu=" + busNumber + " Identyfikator kierowcy=" + busNumber + " Data=" + currentDateAndTime + "Interwa³ czasowy(ms)=" + timeIntervalBetweenGPSDataSaves.ToString() + ">";
+            Handler h = new Handler(Looper.MainLooper);
+
+            if (userName == "")
+                fileNameWithGPSData = guestID + "=bus" + busNumber + "_" + currentDateAndTime.Replace(" ", "_") + ".txt";
+            else
+                fileNameWithGPSData = userName + "=" + currentDateAndTime.Replace(" ", "_") + ".txt";
+
+            WriteToFile(fileNameWithGPSData, header);
+            
+            while (isTrackingEnabled)
+            {
+                Action action = new Action(() => WriteToFile(fileNameWithGPSData, "Lat=" + googleMap.MyLocation.Latitude + " Lon" + googleMap.MyLocation.Longitude));
+                h.Post(action);
+
+                //delay between next GPS data saves
+                System.Threading.Thread.Sleep(timeIntervalBetweenGPSDataSaves);
             }
         }
 
@@ -114,7 +162,7 @@ namespace ZTMobile
 
                     if (userName == receivedLogin && password == receivedPassword)
                     {
-                        query = "UPDATE Users SET LoggedIn=1, LastLoginDate='" + GetCurrentDateFromTheInternet() + "' WHERE Login='" + userName + "'";
+                        query = "UPDATE Users SET LoggedIn=1, LastLoginDate='" + GetCurrentDateFromTheInternet((int)DateFormats.Date) + "' WHERE Login='" + userName + "'";
                         command.CommandText = query;
                         command.ExecuteNonQuery();
                         result = true;

@@ -16,15 +16,42 @@
         android:layout_gravity="center"
         android:id="@+id/buttonTrackTrace"
         android:layout_marginTop="150dp" />
+    <TextView
+        android:text="Numer pojazdu"
+        android:textAppearance="?android:attr/textAppearanceMedium"
+        android:layout_width="match_parent"
+        android:layout_height="30dp"
+        android:layout_marginTop="20dp"
+        android:id="@+id/txtBusNumber"
+        android:textColor="#adad85"
+        android:textSize="20sp"
+        android:gravity="center" />
     <EditText
-        android:layout_width="65dp"
+        android:layout_width="120dp"
         android:layout_height="35dp"
-        android:id="@+id/txtLineNumber"
+        android:id="@+id/txtEditBusNumber"
         android:background="@drawable/edit_text_style"
-        android:hint="Numer linii"
         android:paddingLeft="10dp"
         android:textColor="#000"
-        android:layout_below="@id/buttonTrackTrace"
+        android:layout_marginTop="10dp"
+        android:layout_gravity="center" />
+    <TextView
+        android:text="Numer kierowcy"
+        android:textAppearance="?android:attr/textAppearanceMedium"
+        android:layout_width="match_parent"
+        android:layout_height="30dp"
         android:layout_marginTop="20dp"
+        android:id="@+id/txtBusDriverID"
+        android:textColor="#adad85"
+        android:textSize="20sp"
+        android:gravity="center" />
+    <EditText
+        android:layout_width="120dp"
+        android:layout_height="35dp"
+        android:id="@+id/txtEditBusDriverID"
+        android:background="@drawable/edit_text_style"
+        android:paddingLeft="10dp"
+        android:textColor="#000"
+        android:layout_marginTop="10dp"
         android:layout_gravity="center" />
 </LinearLayout>
