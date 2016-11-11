@@ -9,6 +9,7 @@
   <string name="signInError">Błąd logowania</string>
   <string name="signUpError">Błąd rejestracji</string>
   <string name="signedOut">Wylogowano</string>
+  <string name="photoAddedSuccesfully">Dodano zdjęcie</string>
   <string name="error">Błąd</string>
   <string name="emptyBusNumber">Wpisz numer pojazdu</string>
   <string name="emptyBusDriverID">Wpisz numer kierowcy</string>

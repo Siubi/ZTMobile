@@ -14,6 +14,8 @@ using ZTMobile.Fragments;
 using SupportFragment = Android.Support.V4.App.Fragment;
 using Android.Gms.Maps.Model;
 using Android.Gms.Maps;
+using Android.Graphics;
+using System.IO;
 
 namespace ZTMobile
 {
@@ -85,16 +87,25 @@ namespace ZTMobile
             leftDrawer.ItemClick += LeftDrawer_ItemClick;
             loginScreenFragment.LoggedInSuccessfully += LoginScreenFragment_LoggedInSuccessfully;
             accountScreenFragment.LoggedOutSuccessfully += AccountScreenFragment_LoggedOutSuccessfully;
-            
         }
         
         private void LoginScreenFragment_LoggedInSuccessfully()
         {
+            this.RunOnUiThread(() => { accountScreenFragment.ChangeVisibleUserName(FunctionsAndGlobals.userName); });
+
             if (currentFragment == loginScreenFragment)
             {
-                this.RunOnUiThread(() => { accountScreenFragment.ChangeVisibleUserName(FunctionsAndGlobals.userName); });
                 ShowFragment(accountScreenFragment);
             }
+
+            this.RunOnUiThread(() => { accountScreenFragment.SetProgressBarVisibilityState(true); });
+            Bitmap bitmapImage = FunctionsAndGlobals.GetUserPhotoFromDatabase(FunctionsAndGlobals.userName);
+
+            if (bitmapImage != null)
+            {
+                this.RunOnUiThread(() => { accountScreenFragment.ChangeVisibleUserPhoto(bitmapImage); });
+            }
+            this.RunOnUiThread(() => { accountScreenFragment.SetProgressBarVisibilityState(false); });
         }
 
         private void AccountScreenFragment_LoggedOutSuccessfully()
