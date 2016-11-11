@@ -2563,14 +2563,20 @@ namespace ZTMobile
 			// aapt resource value: 0x7f070020
 			public const int common_signin_button_text_long = 2131165216;
 			
+			// aapt resource value: 0x7f070040
+			public const int emptyBusDriverID = 2131165248;
+			
+			// aapt resource value: 0x7f07003f
+			public const int emptyBusNumber = 2131165247;
+			
 			// aapt resource value: 0x7f07003e
 			public const int error = 2131165246;
 			
-			// aapt resource value: 0x7f07003f
-			public const int exitMessage = 2131165247;
+			// aapt resource value: 0x7f070041
+			public const int exitMessage = 2131165249;
 			
-			// aapt resource value: 0x7f070040
-			public const int google_maps_key = 2131165248;
+			// aapt resource value: 0x7f070042
+			public const int google_maps_key = 2131165250;
 			
 			// aapt resource value: 0x7f070037
 			public const int openDrawer = 2131165239;

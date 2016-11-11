@@ -89,15 +89,23 @@ namespace ZTMobile
             else
                 fileNameWithGPSData = userName + "=" + currentDateAndTime.Replace(" ", "_") + ".txt";
 
-            WriteToFile(fileNameWithGPSData, header);
+            try
+            {
+                WriteToFile(fileNameWithGPSData, header);
+            }
+            catch (Exception ex) { }
             
             while (isTrackingEnabled)
             {
-                Action action = new Action(() => WriteToFile(fileNameWithGPSData, "Lat=" + googleMap.MyLocation.Latitude + " Lon" + googleMap.MyLocation.Longitude));
-                h.Post(action);
+                try
+                {
+                    Action action = new Action(() => { try { WriteToFile(fileNameWithGPSData, "Lat=" + googleMap.MyLocation.Latitude + " Lon" + googleMap.MyLocation.Longitude); } catch (Exception ex) { } });
+                    h.Post(action);
 
-                //delay between next GPS data saves
-                System.Threading.Thread.Sleep(timeIntervalBetweenGPSDataSaves);
+                    //delay between next GPS data saves
+                    System.Threading.Thread.Sleep(timeIntervalBetweenGPSDataSaves);
+                }
+                catch (Exception ex) { }
             }
         }
 
