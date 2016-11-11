@@ -11,6 +11,8 @@ using Android.Util;
 using Android.Views;
 using Android.Widget;
 using System.Threading;
+using Android.Graphics;
+using Android.Provider;
 
 namespace ZTMobile.Fragments
 {
@@ -19,6 +21,7 @@ namespace ZTMobile.Fragments
         private ProgressBar progressBar;
         private Button buttonSignOut;
         private TextView txtUserName;
+        private ImageButton buttonUserImage;
 
         public event Action LoggedOutSuccessfully;
 
@@ -34,10 +37,45 @@ namespace ZTMobile.Fragments
             progressBar = view.FindViewById<ProgressBar>(Resource.Id.progressBarLogOut);
             txtUserName = view.FindViewById<TextView>(Resource.Id.txtUserName);
             buttonSignOut = view.FindViewById<Button>(Resource.Id.buttonSignOut);
+            buttonUserImage = view.FindViewById<ImageButton>(Resource.Id.buttonUserImage);
+
+            buttonUserImage.SetImageBitmap(BitmapFactory.DecodeResource(Resources, Resource.Drawable.plus));
 
             buttonSignOut.Click += ButtonSignOut_Click;
 
+            buttonUserImage.Click += delegate {
+
+                var imageIntent = new Intent();
+                imageIntent.SetType("image/*");
+                imageIntent.SetAction(Intent.ActionGetContent);
+                StartActivityForResult(
+                    Intent.CreateChooser(imageIntent, "Select photo"), 0);
+            };
+
             return view;
+        }
+
+        public override void OnActivityResult(int requestCode, int resultCode, Intent data)
+        {
+            base.OnActivityResult(requestCode, resultCode, data);
+
+            if (resultCode == (int)Result.Ok)
+            {
+                Activity.RunOnUiThread(() => { progressBar.Visibility = ViewStates.Visible; });
+
+                var imageButton = this.View.FindViewById<ImageButton>(Resource.Id.buttonUserImage);
+                Android.Net.Uri imageUri = (Android.Net.Uri)data.Data;
+                Bitmap bitmap = MediaStore.Images.Media.GetBitmap(Context.ContentResolver, imageUri);
+                bitmap = FunctionsAndGlobals.GetCircleBitmap(bitmap);
+
+                if (FunctionsAndGlobals.AddPhotoDatabase(FunctionsAndGlobals.userName, bitmap))
+                {
+                    Activity.RunOnUiThread(() => { Toast.MakeText(Activity.ApplicationContext, Resource.String.photoAddedSuccesfully, ToastLength.Short).Show(); });
+                }
+
+                imageButton.SetImageBitmap(bitmap);
+                Activity.RunOnUiThread(() => { progressBar.Visibility = ViewStates.Invisible; });
+            }
         }
 
         private void ButtonSignOut_Click(object sender, EventArgs e)
@@ -57,6 +95,7 @@ namespace ZTMobile.Fragments
                 Activity.RunOnUiThread(() => { Toast.MakeText(Activity.ApplicationContext, Resource.String.signedOut, ToastLength.Short).Show(); });
                 FunctionsAndGlobals.isUserLoggedIn = false;
                 FunctionsAndGlobals.userName = "";
+                Activity.RunOnUiThread(() => { buttonUserImage.SetImageBitmap(BitmapFactory.DecodeResource(Resources, Resource.Drawable.plus)); });
                 LoggedOutSuccessfully();
             }
             else
@@ -70,6 +109,19 @@ namespace ZTMobile.Fragments
         public void ChangeVisibleUserName(string userName)
         {
             txtUserName.SetText(userName, TextView.BufferType.Normal);
+        }
+
+        public void ChangeVisibleUserPhoto(Bitmap bitmapImage)
+        {
+            buttonUserImage.SetImageBitmap(bitmapImage);
+        }
+
+        public void SetProgressBarVisibilityState(bool state)
+        {
+            if (state == true)
+                progressBar.Visibility = ViewStates.Visible;
+            else
+                progressBar.Visibility = ViewStates.Invisible;
         }
     }
 }

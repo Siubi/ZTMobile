@@ -17,6 +17,9 @@ using Android.Gms.Maps;
 using System.IO;
 using System.Timers;
 using System.Threading;
+using Android.Graphics;
+using Java.IO;
+using Android.Util;
 
 namespace ZTMobile
 {
@@ -69,6 +72,30 @@ namespace ZTMobile
             }
         }
 
+        public static Bitmap GetCircleBitmap(Bitmap bitmap)
+        {
+            bitmap = Bitmap.CreateScaledBitmap(bitmap, 360, 360, false);
+
+            int width = bitmap.Width;
+            int height = bitmap.Height;
+
+            Bitmap output = Bitmap.CreateBitmap(width, height, Bitmap.Config.Argb8888);
+
+            Canvas canvas = new Canvas(output);
+            Paint paintColor = new Paint();
+            paintColor.Flags = PaintFlags.AntiAlias;
+
+            RectF rectF = new RectF(new Rect(0, 0, width, height));
+
+            canvas.DrawRoundRect(rectF, width / 2, height / 2, paintColor);
+
+            Paint paintImage = new Paint();
+            paintImage.SetXfermode(new PorterDuffXfermode(PorterDuff.Mode.SrcAtop));
+            canvas.DrawBitmap(bitmap, 0, 0, paintImage);
+
+            return output;
+        }
+
         public static void WriteToFile(string fileName, string text)
         {
             string path = Android.OS.Environment.ExternalStorageDirectory.AbsolutePath;
@@ -87,7 +114,7 @@ namespace ZTMobile
             if (userName == "")
                 fileNameWithGPSData = guestID + "=bus" + busNumber + "_" + currentDateAndTime.Replace(" ", "_") + ".txt";
             else
-                fileNameWithGPSData = userName + "=" + currentDateAndTime.Replace(" ", "_") + ".txt";
+                fileNameWithGPSData = userName + "=bus" + busNumber + "_" + currentDateAndTime.Replace(" ", "_") + ".txt";
 
             try
             {
@@ -253,6 +280,106 @@ namespace ZTMobile
             }
 
             return result;
+        }
+
+        public static Boolean AddPhotoDatabase(string userName, Bitmap photo)
+        {
+            MySqlConnection connection = new MySqlConnection("SERVER=db4free.net;PORT=3306;DATABASE=ztmobile;UID=ztmobile;PWD=admin123;");
+            MySqlCommand command;
+            MySqlDataReader receivedResponse;
+            string query;
+            string receivedLogin;
+            Boolean result;
+
+            try
+            {
+                connection.Open();
+                query = "SELECT * FROM Users WHERE Login='" + userName + "'";
+
+                command = new MySqlCommand(query, connection);
+                receivedResponse = command.ExecuteReader();
+
+                if (receivedResponse.Read())
+                {
+                    receivedLogin = receivedResponse.GetString("Login");
+                    receivedResponse.Close();
+
+                    if (userName == receivedLogin)
+                    {
+                        MemoryStream stream = new MemoryStream();
+                        photo.Compress(Bitmap.CompressFormat.Png, 90, stream); //compress to which format you want.
+                        byte[] byte_arr = stream.ToArray();
+                        String image_str = Base64.EncodeToString(byte_arr, Base64.Default);
+
+                        query = "UPDATE Users SET Photo='" + image_str + "' WHERE Login='" + userName + "'";
+                        command.CommandText = query;
+                        command.ExecuteNonQuery();
+                        result = true;
+                    }
+                    else
+                    {
+                        result = false;
+                    }
+                }
+                else
+                {
+                    //User does not exist
+                    result = false;
+                }
+            }
+            catch (Exception ex)
+            {
+                result = false;
+            }
+            finally
+            {
+                connection.Close();
+            }
+
+            return result;
+        }
+
+        public static Bitmap GetUserPhotoFromDatabase(string userName)
+        {
+            MySqlConnection connection = new MySqlConnection("SERVER=db4free.net;PORT=3306;DATABASE=ztmobile;UID=ztmobile;PWD=admin123;");
+            MySqlCommand command;
+            MySqlDataReader receivedResponse;
+            string query;
+            string receivedLogin;
+            string receivedPhotoBLOB;
+            Bitmap bitmapPohoto = null;
+
+            try
+            {
+                connection.Open();
+                query = "SELECT * FROM Users WHERE Login='" + userName + "'";
+
+                command = new MySqlCommand(query, connection);
+                receivedResponse = command.ExecuteReader();
+
+                if (receivedResponse.Read())
+                {
+                    receivedLogin = receivedResponse.GetString("Login");
+                    receivedPhotoBLOB = receivedResponse.GetString("Photo");
+                    receivedResponse.Close();
+
+                    if (userName == receivedLogin && receivedPhotoBLOB != "")
+                    {
+                        byte[] data = Base64.Decode(receivedPhotoBLOB, Base64Flags.Default);
+                        bitmapPohoto = BitmapFactory.DecodeByteArray(data, 0, data.Length, null);
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+
+            }
+            finally
+            {
+                connection.Close();
+            }
+
+            return bitmapPohoto;
         }
     }
 }

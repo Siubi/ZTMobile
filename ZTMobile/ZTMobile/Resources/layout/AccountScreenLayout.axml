@@ -7,13 +7,20 @@
     android:weightSum="100"
     android:minWidth="25px"
     android:minHeight="25px">
+  <ImageButton
+        android:layout_gravity="center"
+        android:layout_width="130dp"
+        android:layout_height="130dp"
+        android:layout_marginTop="40dp"
+        android:id="@+id/buttonUserImage"
+        android:background="@drawable/user_photo_button" />
     <TextView
         android:text=""
         android:textAppearance="?android:attr/textAppearanceMedium"
         android:layout_width="match_parent"
         android:layout_weight="20"
-        android:layout_height="0dp"
-        android:layout_marginTop="50dp"
+        android:layout_height="40dp"
+        android:layout_marginTop="10dp"
         android:id="@+id/txtUserName"
         android:textColor="#adad85"
         android:textSize="35sp"
@@ -25,7 +32,7 @@
         android:id="@+id/buttonSignOut"
         android:layout_marginLeft="80dp"
         android:layout_marginRight="80dp"
-        android:layout_marginTop="200dp" />
+        android:layout_marginTop="100dp" />
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="0dp"
