@@ -42,6 +42,7 @@ namespace ZTMobile.Fragments
 
             //generate random ID for guest
             txtGuestName.Text = "Guest" + rnd.Next(10000, 99999).ToString();
+            FunctionsAndGlobals.guestID = txtGuestName.Text;
 
             //We want to pop out new windows on clicks
             buttonSignUp.Click += ButtonSignUp_Click;

@@ -10,12 +10,15 @@ using Android.Runtime;
 using Android.Util;
 using Android.Views;
 using Android.Widget;
+using System.Threading;
 
 namespace ZTMobile.Fragments
 {
     public class TrackingScreen : Android.Support.V4.App.Fragment
     {
         private Button buttonTrackingTrace;
+        private EditText txtBusNumber;
+        private EditText txtBusDriverID;
 
         public override void OnCreate(Bundle savedInstanceState)
         {
@@ -29,6 +32,8 @@ namespace ZTMobile.Fragments
             View view = inflater.Inflate(Resource.Layout.TrackingScreenLayout, container, false);
 
             buttonTrackingTrace = view.FindViewById<Button>(Resource.Id.buttonTrackTrace);
+            txtBusNumber = view.FindViewById<EditText>(Resource.Id.txtEditBusNumber);
+            txtBusDriverID = view.FindViewById<EditText>(Resource.Id.txtEditBusDriverID);
             FunctionsAndGlobals.isTrackingEnabled = false;
 
             buttonTrackingTrace.Click += ButtonTrackingTrace_Click;
@@ -44,6 +49,9 @@ namespace ZTMobile.Fragments
                 buttonTrackingTrace.SetBackgroundResource(Resource.Drawable.rounded_button_stop);
                 FunctionsAndGlobals.isTrackingEnabled = true;
                 FunctionsAndGlobals.googleMap.MyLocationEnabled = true;
+
+                Thread thread = new Thread(() => FunctionsAndGlobals.SaveGPSDataToFile(txtBusNumber.Text, txtBusDriverID.Text));
+                thread.Start();
             }
             else
             {

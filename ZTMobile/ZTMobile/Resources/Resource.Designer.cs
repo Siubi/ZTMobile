@@ -2152,14 +2152,23 @@ namespace ZTMobile
 			// aapt resource value: 0x7f0b0068
 			public const int txrOr = 2131427432;
 			
+			// aapt resource value: 0x7f0b0088
+			public const int txtBusDriverID = 2131427464;
+			
+			// aapt resource value: 0x7f0b0086
+			public const int txtBusNumber = 2131427462;
+			
+			// aapt resource value: 0x7f0b0089
+			public const int txtEditBusDriverID = 2131427465;
+			
+			// aapt resource value: 0x7f0b0087
+			public const int txtEditBusNumber = 2131427463;
+			
 			// aapt resource value: 0x7f0b0062
 			public const int txtEmailSignUp = 2131427426;
 			
 			// aapt resource value: 0x7f0b0066
 			public const int txtGuestName = 2131427430;
-			
-			// aapt resource value: 0x7f0b0086
-			public const int txtLineNumber = 2131427462;
 			
 			// aapt resource value: 0x7f0b005e
 			public const int txtLoginSignIn = 2131427422;
