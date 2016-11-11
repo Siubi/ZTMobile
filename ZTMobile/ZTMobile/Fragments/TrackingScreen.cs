@@ -45,10 +45,28 @@ namespace ZTMobile.Fragments
         {
             if (FunctionsAndGlobals.isTrackingEnabled == false)
             {
+                if (txtBusNumber.Text == "")
+                {
+                    Activity.RunOnUiThread(() => { Toast.MakeText(Activity.ApplicationContext, Resource.String.emptyBusNumber, ToastLength.Short).Show(); });
+                    return;
+                }
+                if (txtBusDriverID.Text == "")
+                {
+                    Activity.RunOnUiThread(() => { Toast.MakeText(Activity.ApplicationContext, Resource.String.emptyBusDriverID, ToastLength.Short).Show(); });
+                    return;
+                }
+
                 buttonTrackingTrace.Text = "Stop";
                 buttonTrackingTrace.SetBackgroundResource(Resource.Drawable.rounded_button_stop);
                 FunctionsAndGlobals.isTrackingEnabled = true;
                 FunctionsAndGlobals.googleMap.MyLocationEnabled = true;
+
+                txtBusNumber.Focusable = false;
+                txtBusNumber.FocusableInTouchMode = false;
+                txtBusNumber.Enabled = false;
+                txtBusDriverID.Focusable = false;
+                txtBusDriverID.FocusableInTouchMode = false;
+                txtBusDriverID.Enabled = false;
 
                 Thread thread = new Thread(() => FunctionsAndGlobals.SaveGPSDataToFile(txtBusNumber.Text, txtBusDriverID.Text));
                 thread.Start();
@@ -59,6 +77,14 @@ namespace ZTMobile.Fragments
                 buttonTrackingTrace.SetBackgroundResource(Resource.Drawable.rounded_button);
                 FunctionsAndGlobals.isTrackingEnabled = false;
                 FunctionsAndGlobals.googleMap.MyLocationEnabled = false;
+                FunctionsAndGlobals.googleMap.Clear();
+
+                txtBusNumber.Focusable = true;
+                txtBusNumber.FocusableInTouchMode = true;
+                txtBusNumber.Enabled = true;
+                txtBusDriverID.Focusable = true;
+                txtBusDriverID.FocusableInTouchMode = true;
+                txtBusDriverID.Enabled = true;
             }
         }
     }

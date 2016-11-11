@@ -10,6 +10,8 @@
   <string name="signUpError">Błąd rejestracji</string>
   <string name="signedOut">Wylogowano</string>
   <string name="error">Błąd</string>
+  <string name="emptyBusNumber">Wpisz numer pojazdu</string>
+  <string name="emptyBusDriverID">Wpisz numer kierowcy</string>
   <string name="exitMessage">Wciśnij ponownie aby wyjść</string>
   <string name="google_maps_key">AIzaSyCOn0hObnk48JpqWOb-EhAzXRbLzdYYs84</string>
 </resources>
