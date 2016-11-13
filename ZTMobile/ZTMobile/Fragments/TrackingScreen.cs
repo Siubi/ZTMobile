@@ -68,7 +68,7 @@ namespace ZTMobile.Fragments
                 txtBusDriverID.FocusableInTouchMode = false;
                 txtBusDriverID.Enabled = false;
 
-                Thread thread = new Thread(() => FunctionsAndGlobals.SaveGPSDataToFile(txtBusNumber.Text, txtBusDriverID.Text));
+                Thread thread = new Thread(() => FunctionsAndGlobals.SaveAndSendGPSDataToFile(txtBusNumber.Text, txtBusDriverID.Text));
                 thread.Start();
             }
             else

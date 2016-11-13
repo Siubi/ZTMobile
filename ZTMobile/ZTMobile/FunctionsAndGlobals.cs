@@ -105,10 +105,10 @@ namespace ZTMobile
             stream.Close();
         }
 
-        public static void SaveGPSDataToFile(string busNumber, string busDriverID)
+        public static void SaveAndSendGPSDataToFile(string busNumber, string busDriverID)
         {
             String currentDateAndTime = GetCurrentDateFromTheInternet((int)DateFormats.DateAndTime);
-            String header = "<Numer autobusu=" + busNumber + " Identyfikator kierowcy=" + busNumber + " Data=" + currentDateAndTime + "Interwa³ czasowy(ms)=" + timeIntervalBetweenGPSDataSaves.ToString() + ">";
+            String header = "<Numer autobusu=" + busNumber + " Identyfikator kierowcy=" + busNumber + " Data=" + currentDateAndTime + " Interwa³ czasowy(ms)=" + timeIntervalBetweenGPSDataSaves.ToString() + ">";
             Handler h = new Handler(Looper.MainLooper);
 
             if (userName == "")
@@ -134,6 +134,53 @@ namespace ZTMobile
                 }
                 catch (Exception ex) { }
             }
+
+            string path = Android.OS.Environment.ExternalStorageDirectory.AbsolutePath;
+            string filePath = System.IO.Path.Combine(path, fileNameWithGPSData);
+
+            if (userName == "")
+                SendFileToDatabase(userName, guestID, busNumber, busDriverID, currentDateAndTime);
+            else
+                SendFileToDatabase(userName, filePath, busNumber, busDriverID, currentDateAndTime);
+        }
+
+        public static Boolean SendFileToDatabase(string userName, string filePath, string busNumber, string busDriverID, string date)
+        {
+            MySqlConnection connection = new MySqlConnection("SERVER=db4free.net;PORT=3306;DATABASE=ztmobile;UID=ztmobile;PWD=admin123;");
+            MySqlCommand command;
+            string query;
+            Boolean result;
+
+            try
+            {
+                connection.Open();
+                query = "INSERT INTO Files(Login, File, Bus, BusDriverID, Date) VALUES(@user,@file,@busNumber,@busDriverID,@date)";
+
+
+                MemoryStream stream = new MemoryStream();
+                byte[] byte_arr = System.IO.File.ReadAllBytes(filePath);
+                String file_str = Base64.EncodeToString(byte_arr, Base64.Default);
+
+                command = new MySqlCommand(query, connection);
+                command.Parameters.AddWithValue("@user", userName);
+                command.Parameters.AddWithValue("@file", file_str);
+                command.Parameters.AddWithValue("@busNumber", busNumber);
+                command.Parameters.AddWithValue("@busDriverID", busDriverID);
+                command.Parameters.AddWithValue("@date", date);
+                command.ExecuteNonQuery();
+                command.Parameters.Clear();
+                result = true;
+            }
+            catch (Exception ex)
+            {
+                result = false;
+            }
+            finally
+            {
+                connection.Close();
+            }
+
+            return result;
         }
 
         //Password should be already encrypted by MD5
