@@ -139,7 +139,7 @@ namespace ZTMobile
             string filePath = System.IO.Path.Combine(path, fileNameWithGPSData);
 
             if (userName == "")
-                SendFileToDatabase(userName, guestID, busNumber, busDriverID, currentDateAndTime);
+                SendFileToDatabase(guestID, filePath, busNumber, busDriverID, currentDateAndTime);
             else
                 SendFileToDatabase(userName, filePath, busNumber, busDriverID, currentDateAndTime);
         }
