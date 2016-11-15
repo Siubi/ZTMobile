@@ -93,6 +93,7 @@
     <Compile Include="Fragments\AccountScreen.cs" />
     <Compile Include="Fragments\LoginScreen.cs" />
     <Compile Include="Fragments\MapScreen.cs" />
+    <Compile Include="Fragments\RankingScreen.cs" />
     <Compile Include="Fragments\TrackingScreen.cs" />
     <Compile Include="FunctionsAndGlobals.cs" />
     <Compile Include="MainActivity.cs" />
@@ -120,6 +121,9 @@
       <SubType>Designer</SubType>
     </AndroidResource>
     <AndroidResource Include="Resources\layout\AccountScreenLayout.axml">
+      <SubType>Designer</SubType>
+    </AndroidResource>
+    <AndroidResource Include="Resources\layout\RankingScreenLayout.axml">
       <SubType>Designer</SubType>
     </AndroidResource>
   </ItemGroup>
