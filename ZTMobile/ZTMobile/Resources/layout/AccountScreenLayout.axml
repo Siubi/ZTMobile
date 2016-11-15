@@ -4,10 +4,9 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="#1a1a1a"
-    android:weightSum="100"
     android:minWidth="25px"
     android:minHeight="25px">
-  <ImageButton
+    <ImageButton
         android:layout_gravity="center"
         android:layout_width="130dp"
         android:layout_height="130dp"
@@ -18,28 +17,36 @@
         android:text=""
         android:textAppearance="?android:attr/textAppearanceMedium"
         android:layout_width="match_parent"
-        android:layout_weight="20"
-        android:layout_height="40dp"
+        android:layout_height="45dp"
         android:layout_marginTop="10dp"
         android:id="@+id/txtUserName"
         android:textColor="#adad85"
         android:textSize="35sp"
         android:gravity="center" />
+    <TextView
+        android:text="Punkty: "
+        android:textAppearance="?android:attr/textAppearanceMedium"
+        android:layout_width="match_parent"
+        android:layout_height="40dp"
+        android:layout_marginTop="25dp"
+        android:id="@+id/txtPoints"
+        android:textColor="#ffffff"
+        android:textSize="28sp"
+        android:gravity="center" />
     <Button
         android:text="Wyloguj"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="40dp"
         android:id="@+id/buttonSignOut"
         android:layout_marginLeft="80dp"
         android:layout_marginRight="80dp"
-        android:layout_marginTop="100dp" />
+        android:layout_marginTop="50dp" />
     <RelativeLayout
         android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_weight="35"
-        android:minWidth="25px"
-        android:minHeight="25px"
-        android:layout_marginTop="60dp">
+        android:layout_height="100dp"
+        android:minWidth="50px"
+        android:minHeight="50px"
+        android:layout_marginTop="20dp">
         <ProgressBar
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"

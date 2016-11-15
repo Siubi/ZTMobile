@@ -21,6 +21,7 @@ namespace ZTMobile.Fragments
         private ProgressBar progressBar;
         private Button buttonSignOut;
         private TextView txtUserName;
+        private TextView txtPoints;
         private ImageButton buttonUserImage;
 
         public event Action LoggedOutSuccessfully;
@@ -36,6 +37,7 @@ namespace ZTMobile.Fragments
 
             progressBar = view.FindViewById<ProgressBar>(Resource.Id.progressBarLogOut);
             txtUserName = view.FindViewById<TextView>(Resource.Id.txtUserName);
+            txtPoints = view.FindViewById<TextView>(Resource.Id.txtPoints);
             buttonSignOut = view.FindViewById<Button>(Resource.Id.buttonSignOut);
             buttonUserImage = view.FindViewById<ImageButton>(Resource.Id.buttonUserImage);
 
@@ -95,6 +97,7 @@ namespace ZTMobile.Fragments
                 Activity.RunOnUiThread(() => { Toast.MakeText(Activity.ApplicationContext, Resource.String.signedOut, ToastLength.Short).Show(); });
                 FunctionsAndGlobals.isUserLoggedIn = false;
                 FunctionsAndGlobals.userName = "";
+                FunctionsAndGlobals.userPoints = 0;
                 Activity.RunOnUiThread(() => { buttonUserImage.SetImageBitmap(BitmapFactory.DecodeResource(Resources, Resource.Drawable.plus)); });
                 LoggedOutSuccessfully();
             }
@@ -109,6 +112,13 @@ namespace ZTMobile.Fragments
         public void ChangeVisibleUserName(string userName)
         {
             txtUserName.SetText(userName, TextView.BufferType.Normal);
+        }
+
+        public void ChangeVisiblePoints(int points)
+        {
+            string text;
+            text = "Punkty: " + points.ToString();
+            txtPoints.SetText(text, TextView.BufferType.Normal);
         }
 
         public void ChangeVisibleUserPhoto(Bitmap bitmapImage)

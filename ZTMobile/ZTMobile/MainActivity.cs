@@ -16,6 +16,7 @@ using Android.Gms.Maps.Model;
 using Android.Gms.Maps;
 using Android.Graphics;
 using System.IO;
+using Android.Views.Animations;
 
 namespace ZTMobile
 {
@@ -31,6 +32,7 @@ namespace ZTMobile
         private LoginScreen loginScreenFragment;
         private MapScreen mapScreenFragment;
         private AccountScreen accountScreenFragment;
+        private RankingScreen rankingScreenFragment;
         private DateTime lastBackButtonClickTime;
 
         List<String> leftMenuItems = new List<String>();
@@ -53,6 +55,7 @@ namespace ZTMobile
 
             leftMenuItems.Add("Śledzenie");
             leftMenuItems.Add("Konto");
+            leftMenuItems.Add("Ranking");
             leftMenuItems.Add("Mapa");
             leftMenuArrayAdapter = new ArrayAdapter(this, Android.Resource.Layout.SimpleListItem1, leftMenuItems);
             leftDrawer.Adapter = leftMenuArrayAdapter;
@@ -63,12 +66,15 @@ namespace ZTMobile
             loginScreenFragment = new LoginScreen();
             mapScreenFragment = new MapScreen();
             accountScreenFragment = new AccountScreen();
+            rankingScreenFragment = new RankingScreen();
 
             var transaction = SupportFragmentManager.BeginTransaction();
             transaction.Add(Resource.Id.fragmentContainer, accountScreenFragment, "Account Screen");
             transaction.Hide(accountScreenFragment);
             transaction.Add(Resource.Id.fragmentContainer, mapScreenFragment, "Map Screen");
             transaction.Hide(mapScreenFragment);
+            transaction.Add(Resource.Id.fragmentContainer, rankingScreenFragment, "Ranking Screen");
+            transaction.Hide(rankingScreenFragment);
             transaction.Add(Resource.Id.fragmentContainer, loginScreenFragment, "Login Screen");
             transaction.Hide(loginScreenFragment);
             transaction.Add(Resource.Id.fragmentContainer, trackingScreenFragment, "Tracking Screen");
@@ -88,7 +94,15 @@ namespace ZTMobile
             loginScreenFragment.LoggedInSuccessfully += LoginScreenFragment_LoggedInSuccessfully;
             accountScreenFragment.LoggedOutSuccessfully += AccountScreenFragment_LoggedOutSuccessfully;
         }
-        
+
+        private void PointsValueOnActionBar_TextChanged(object sender, Android.Text.TextChangedEventArgs e)
+        {
+            FunctionsAndGlobals.pointsValueOnActionBar.StartAnimation(AnimationUtils.LoadAnimation(this, Resource.Animation.abc_fade_in));
+
+            if (FunctionsAndGlobals.pointsValueOnActionBar.Text != "")
+                this.RunOnUiThread(() => { accountScreenFragment.ChangeVisiblePoints(Int32.Parse(FunctionsAndGlobals.pointsValueOnActionBar.Text)); });
+        }
+
         private void LoginScreenFragment_LoggedInSuccessfully()
         {
             this.RunOnUiThread(() => { accountScreenFragment.ChangeVisibleUserName(FunctionsAndGlobals.userName); });
@@ -97,6 +111,9 @@ namespace ZTMobile
             {
                 ShowFragment(accountScreenFragment);
             }
+
+            Thread thread = new Thread(() => GetAndSetUserPoints());
+            thread.Start();
 
             this.RunOnUiThread(() => { accountScreenFragment.SetProgressBarVisibilityState(true); });
             Bitmap bitmapImage = FunctionsAndGlobals.GetUserPhotoFromDatabase(FunctionsAndGlobals.userName);
@@ -110,12 +127,36 @@ namespace ZTMobile
 
         private void AccountScreenFragment_LoggedOutSuccessfully()
         {
+            Thread thread = new Thread(() => ClearActionBar());
+            thread.Start();
+
             if (currentFragment == accountScreenFragment)
             {
                 ShowFragment(loginScreenFragment);
             }
         }
 
+        public void ClearActionBar()
+        {
+            this.RunOnUiThread(() => { FunctionsAndGlobals.pointsTextOnActionBar.Text = ""; });
+            this.RunOnUiThread(() => { FunctionsAndGlobals.pointsValueOnActionBar.Text = ""; });
+        }
+
+        public void GetAndSetUserPoints()
+        {
+            int result = -1;
+            while (result == -1)
+            {
+                result = FunctionsAndGlobals.GetUserPointsFromDatabase(FunctionsAndGlobals.userName);
+            }
+
+            FunctionsAndGlobals.userPoints = result;
+
+            this.RunOnUiThread(() => { FunctionsAndGlobals.pointsTextOnActionBar.Text = "Punkty:"; });
+            this.RunOnUiThread(() => { FunctionsAndGlobals.pointsValueOnActionBar.Text = FunctionsAndGlobals.userPoints.ToString(); });
+
+            this.RunOnUiThread(() => { accountScreenFragment.ChangeVisiblePoints(FunctionsAndGlobals.userPoints); });
+        }
 
         private void LeftDrawer_ItemClick(object sender, AdapterView.ItemClickEventArgs e)
         {
@@ -136,8 +177,13 @@ namespace ZTMobile
                     ShowFragment(loginScreenFragment);
                 }
             }
-            //Map Screen
+            //Ranking Screen
             if (e.Position == 2)
+            {
+                ShowFragment(rankingScreenFragment);
+            }
+            //Map Screen
+            if (e.Position == 3)
             {
                 if (FunctionsAndGlobals.isTrackingEnabled == true)
                 {
@@ -156,6 +202,31 @@ namespace ZTMobile
         {
             drawerToggle.OnOptionsItemSelected(item);
             return base.OnOptionsItemSelected(item);
+        }
+
+        public override bool OnCreateOptionsMenu(IMenu menu)
+        {
+            TextView pointsTextOnActionBar = new TextView(this);
+            pointsTextOnActionBar.SetTextColor(Color.White);
+            pointsTextOnActionBar.SetPadding(0, 0, 20, 0);
+            pointsTextOnActionBar.SetTypeface(null, TypefaceStyle.Bold);
+            pointsTextOnActionBar.SetTextSize(Android.Util.ComplexUnitType.Dip, 21);
+            menu.Add(0, 1, 1, Resource.String.error).SetActionView(pointsTextOnActionBar).SetShowAsAction(ShowAsAction.Always);
+            pointsTextOnActionBar.Text = "";
+            FunctionsAndGlobals.pointsTextOnActionBar = pointsTextOnActionBar;
+
+            TextView pointsValueOnActionBar = new TextView(this);
+            pointsValueOnActionBar.SetTextColor(Color.White);
+            pointsValueOnActionBar.SetPadding(0, 0, 20, 0);
+            pointsValueOnActionBar.SetTypeface(null, TypefaceStyle.Bold);
+            pointsValueOnActionBar.SetTextSize(Android.Util.ComplexUnitType.Dip, 21);
+            menu.Add(0, 1, 2, Resource.String.error).SetActionView(pointsValueOnActionBar).SetShowAsAction(ShowAsAction.Always);
+            pointsValueOnActionBar.Text = "";
+            FunctionsAndGlobals.pointsValueOnActionBar = pointsValueOnActionBar;
+            
+            FunctionsAndGlobals.pointsValueOnActionBar.TextChanged += PointsValueOnActionBar_TextChanged;
+
+            return base.OnCreateOptionsMenu(menu);
         }
 
         public override void OnBackPressed()

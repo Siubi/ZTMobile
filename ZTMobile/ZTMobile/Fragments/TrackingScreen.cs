@@ -11,6 +11,8 @@ using Android.Util;
 using Android.Views;
 using Android.Widget;
 using System.Threading;
+using Android.Locations;
+using Android.Views.InputMethods;
 
 namespace ZTMobile.Fragments
 {
@@ -36,6 +38,26 @@ namespace ZTMobile.Fragments
             txtBusDriverID = view.FindViewById<EditText>(Resource.Id.txtEditBusDriverID);
             FunctionsAndGlobals.isTrackingEnabled = false;
 
+            txtBusNumber.KeyPress += (object sender, View.KeyEventArgs e) => {
+                e.Handled = false;
+                if (e.Event.Action == KeyEventActions.Down && e.KeyCode == Keycode.Enter)
+                {
+                    InputMethodManager manager = (InputMethodManager)Activity.GetSystemService(Context.InputMethodService);
+                    manager.HideSoftInputFromWindow(txtBusNumber.WindowToken, 0);
+                    e.Handled = true;
+                }
+            };
+
+            txtBusDriverID.KeyPress += (object sender, View.KeyEventArgs e) => {
+                e.Handled = false;
+                if (e.Event.Action == KeyEventActions.Down && e.KeyCode == Keycode.Enter)
+                {
+                    InputMethodManager manager = (InputMethodManager)Activity.GetSystemService(Context.InputMethodService);
+                    manager.HideSoftInputFromWindow(txtBusDriverID.WindowToken, 0);
+                    e.Handled = true;
+                }
+            };
+
             buttonTrackingTrace.Click += ButtonTrackingTrace_Click;
 
             return view;
@@ -50,13 +72,20 @@ namespace ZTMobile.Fragments
                     Activity.RunOnUiThread(() => { Toast.MakeText(Activity.ApplicationContext, Resource.String.emptyBusNumber, ToastLength.Short).Show(); });
                     return;
                 }
-                if (txtBusDriverID.Text == "")
+                //if (txtBusDriverID.Text == "")
+                //{
+                //    Activity.RunOnUiThread(() => { Toast.MakeText(Activity.ApplicationContext, Resource.String.emptyBusDriverID, ToastLength.Short).Show(); });
+                //    return;
+                //}
+
+                LocationManager manager = (LocationManager)Activity.GetSystemService(Context.LocationService);
+                if (!manager.IsProviderEnabled(LocationManager.GpsProvider))
                 {
-                    Activity.RunOnUiThread(() => { Toast.MakeText(Activity.ApplicationContext, Resource.String.emptyBusDriverID, ToastLength.Short).Show(); });
+                    Activity.RunOnUiThread(() => { Toast.MakeText(Activity.ApplicationContext, Resource.String.gpsNotEnabled, ToastLength.Short).Show(); });
                     return;
                 }
 
-                buttonTrackingTrace.Text = "Stop";
+                    buttonTrackingTrace.Text = "Stop";
                 buttonTrackingTrace.SetBackgroundResource(Resource.Drawable.rounded_button_stop);
                 FunctionsAndGlobals.isTrackingEnabled = true;
                 FunctionsAndGlobals.googleMap.MyLocationEnabled = true;
