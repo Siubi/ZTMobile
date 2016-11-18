@@ -2107,6 +2107,12 @@ namespace ZTMobile
 			// aapt resource value: 0x7f0b0037
 			public const int spacer = 2131427383;
 			
+			// aapt resource value: 0x7f0b0095
+			public const int spinnerBusDir = 2131427477;
+			
+			// aapt resource value: 0x7f0b0093
+			public const int spinnerBusNumber = 2131427475;
+			
 			// aapt resource value: 0x7f0b0007
 			public const int split_action_bar = 2131427335;
 			
@@ -2162,16 +2168,16 @@ namespace ZTMobile
 			public const int txrOr = 2131427434;
 			
 			// aapt resource value: 0x7f0b0094
-			public const int txtBusDriverID = 2131427476;
+			public const int txtBusDir = 2131427476;
+			
+			// aapt resource value: 0x7f0b0096
+			public const int txtBusDriverID = 2131427478;
 			
 			// aapt resource value: 0x7f0b0092
 			public const int txtBusNumber = 2131427474;
 			
-			// aapt resource value: 0x7f0b0095
-			public const int txtEditBusDriverID = 2131427477;
-			
-			// aapt resource value: 0x7f0b0093
-			public const int txtEditBusNumber = 2131427475;
+			// aapt resource value: 0x7f0b0097
+			public const int txtEditBusDriverID = 2131427479;
 			
 			// aapt resource value: 0x7f0b0064
 			public const int txtEmailSignUp = 2131427428;

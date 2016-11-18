@@ -54,7 +54,8 @@
   <ItemGroup>
     <Reference Include="Mono.Android" />
     <Reference Include="mscorlib" />
-    <Reference Include="MySql.Data.CF">
+    <Reference Include="MySql.Data.CF, Version=6.9.5.0, Culture=neutral, PublicKeyToken=c5687fc88969c44d, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
       <HintPath>Libraries\MySqlConnector\android\MySql.Data.CF.dll</HintPath>
     </Reference>
     <Reference Include="System" />

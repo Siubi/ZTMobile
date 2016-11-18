@@ -19,8 +19,10 @@ namespace ZTMobile.Fragments
     public class TrackingScreen : Android.Support.V4.App.Fragment
     {
         private Button buttonTrackingTrace;
-        private EditText txtBusNumber;
         private EditText txtBusDriverID;
+        private String lineName;
+        private String dirName;
+        private String emptyField = "Wybierz";
 
         public override void OnCreate(Bundle savedInstanceState)
         {
@@ -34,17 +36,52 @@ namespace ZTMobile.Fragments
             View view = inflater.Inflate(Resource.Layout.TrackingScreenLayout, container, false);
 
             buttonTrackingTrace = view.FindViewById<Button>(Resource.Id.buttonTrackTrace);
-            txtBusNumber = view.FindViewById<EditText>(Resource.Id.txtEditBusNumber);
             txtBusDriverID = view.FindViewById<EditText>(Resource.Id.txtEditBusDriverID);
+            var txtBusDir = view.FindViewById<TextView>(Resource.Id.txtBusDir);
+            txtBusDir.Visibility = ViewStates.Invisible;
+            var spinnerDir = view.FindViewById<Spinner>(Resource.Id.spinnerBusDir);
+            spinnerDir.Visibility = ViewStates.Invisible;
+            
             FunctionsAndGlobals.isTrackingEnabled = false;
-
-            txtBusNumber.KeyPress += (object sender, View.KeyEventArgs e) => {
+            
+       /*     txtBusNumber.KeyPress += (object sender, View.KeyEventArgs e) => {
                 e.Handled = false;
                 if (e.Event.Action == KeyEventActions.Down && e.KeyCode == Keycode.Enter)
                 {
                     InputMethodManager manager = (InputMethodManager)Activity.GetSystemService(Context.InputMethodService);
                     manager.HideSoftInputFromWindow(txtBusNumber.WindowToken, 0);
                     e.Handled = true;
+                }
+            };
+            */
+            List<String> lines = FunctionsAndGlobals.getAllLines();
+            var adapter = new ArrayAdapter<String>(Activity.ApplicationContext, Android.Resource.Layout.SimpleSpinnerItem, lines);
+            adapter.SetDropDownViewResource(Android.Resource.Layout.SimpleSpinnerDropDownItem);
+            var spinner = view.FindViewById<Spinner>(Resource.Id.spinnerBusNumber);
+            spinner.Adapter = adapter;
+            spinner.ItemSelected += (sender, e) =>
+            {
+                var s = sender as Spinner;
+                lineName = (String)s.GetItemAtPosition(e.Position);
+                if (lineName != emptyField)
+                {
+                    List<String> dirs = FunctionsAndGlobals.getDirections((String)s.GetItemAtPosition(e.Position));
+                    var adapterDirs = new ArrayAdapter<String>(Activity.ApplicationContext, Android.Resource.Layout.SimpleSpinnerItem, dirs);
+                    adapterDirs.SetDropDownViewResource(Android.Resource.Layout.SimpleSpinnerDropDownItem);
+                    spinnerDir.Adapter = adapterDirs;
+                    spinnerDir.Visibility = ViewStates.Visible;
+                    txtBusDir.Visibility = ViewStates.Visible;
+                    spinnerDir.ItemSelected += (sender2, e2) =>
+                    {
+                        var s2 = sender2 as Spinner;
+                        dirName = (String)s2.GetItemAtPosition(e2.Position);
+                    };
+                }
+                else
+                {
+                    txtBusDir.Visibility = ViewStates.Gone;
+                    spinnerDir.Visibility = ViewStates.Gone;
+                    dirName = emptyField;
                 }
             };
 
@@ -67,11 +104,12 @@ namespace ZTMobile.Fragments
         {
             if (FunctionsAndGlobals.isTrackingEnabled == false)
             {
-                if (txtBusNumber.Text == "")
+                if (lineName == emptyField || dirName == emptyField)
                 {
                     Activity.RunOnUiThread(() => { Toast.MakeText(Activity.ApplicationContext, Resource.String.emptyBusNumber, ToastLength.Short).Show(); });
                     return;
                 }
+
                 //if (txtBusDriverID.Text == "")
                 //{
                 //    Activity.RunOnUiThread(() => { Toast.MakeText(Activity.ApplicationContext, Resource.String.emptyBusDriverID, ToastLength.Short).Show(); });
@@ -85,19 +123,15 @@ namespace ZTMobile.Fragments
                     return;
                 }
 
-                    buttonTrackingTrace.Text = "Stop";
+                buttonTrackingTrace.Text = "Stop";
                 buttonTrackingTrace.SetBackgroundResource(Resource.Drawable.rounded_button_stop);
                 FunctionsAndGlobals.isTrackingEnabled = true;
                 FunctionsAndGlobals.googleMap.MyLocationEnabled = true;
-
-                txtBusNumber.Focusable = false;
-                txtBusNumber.FocusableInTouchMode = false;
-                txtBusNumber.Enabled = false;
+                
                 txtBusDriverID.Focusable = false;
                 txtBusDriverID.FocusableInTouchMode = false;
                 txtBusDriverID.Enabled = false;
-
-                Thread thread = new Thread(() => FunctionsAndGlobals.SaveAndSendGPSDataToFile(txtBusNumber.Text, txtBusDriverID.Text));
+                Thread thread = new Thread(() => FunctionsAndGlobals.SaveAndSendGPSDataToFile(lineName, dirName, txtBusDriverID.Text));
                 thread.Start();
             }
             else
@@ -107,10 +141,7 @@ namespace ZTMobile.Fragments
                 FunctionsAndGlobals.isTrackingEnabled = false;
                 FunctionsAndGlobals.googleMap.MyLocationEnabled = false;
                 FunctionsAndGlobals.googleMap.Clear();
-
-                txtBusNumber.Focusable = true;
-                txtBusNumber.FocusableInTouchMode = true;
-                txtBusNumber.Enabled = true;
+                
                 txtBusDriverID.Focusable = true;
                 txtBusDriverID.FocusableInTouchMode = true;
                 txtBusDriverID.Enabled = true;

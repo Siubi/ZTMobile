@@ -152,7 +152,7 @@ namespace ZTMobile
             stream.Close();
         }
 
-        public static void SaveAndSendGPSDataToFile(string busNumber, string busDriverID)
+        public static void SaveAndSendGPSDataToFile(string busNumber, string dir, string busDriverID)
         {
             int pointsInThisSession = 0;
             DateTime currentDateAndTime = GetCurrentDateFromTheInternet();
@@ -201,10 +201,10 @@ namespace ZTMobile
             while (!result)
             {
                 if (userName == "")
-                    result = SendFileToDatabase(guestID, filePath, busNumber, busDriverID, currentDateAndTime.ToString("yyyy-MM-dd HH:mm:ss"), GetDayOfWeek(currentDateAndTime), currentDateAndTime.ToString("HH:mm:ss"), 0);
+                    result = SendFileToDatabase(guestID, filePath, busNumber, dir, busDriverID, currentDateAndTime.ToString("yyyy-MM-dd HH:mm:ss"), GetDayOfWeek(currentDateAndTime), currentDateAndTime.ToString("HH:mm:ss"), 0);
                 else
                 {
-                    result = SendFileToDatabase(userName, filePath, busNumber, busDriverID, currentDateAndTime.ToString("yyyy-MM-dd HH:mm:ss"), GetDayOfWeek(currentDateAndTime), currentDateAndTime.ToString("HH:mm:ss"), pointsInThisSession);
+                    result = SendFileToDatabase(userName, filePath, busNumber, dir, busDriverID, currentDateAndTime.ToString("yyyy-MM-dd HH:mm:ss"), GetDayOfWeek(currentDateAndTime), currentDateAndTime.ToString("HH:mm:ss"), pointsInThisSession);
                     userPoints += pointsInThisSession;
                     SetUserPointsInDatabase(userName, userPoints);
                     Action postScore = new Action(() => { pointsValueOnActionBar.Text = (userPoints).ToString(); });
@@ -213,8 +213,9 @@ namespace ZTMobile
             }
         }
 
-        public static Boolean SendFileToDatabase(string userName, string filePath, string busNumber, string busDriverID, string date, string dayOfWeek, string hour, int points)
+        public static Boolean SendFileToDatabase(string userName, string filePath, string busNumber, string dir, string busDriverID, string date, string dayOfWeek, string hour, int points)
         {
+            int busID = getlineID(busNumber, dir);
             MySqlConnection connection = new MySqlConnection("SERVER=s12.hekko.net.pl;PORT=3306;DATABASE=ztmobile_0;UID=ztmobile_0;PWD=admin123;");
             MySqlCommand command;
             string query;
@@ -223,7 +224,7 @@ namespace ZTMobile
             try
             {
                 connection.Open();
-                query = "INSERT INTO RouteTrackFiles(Login, File, Bus, BusDriverID, Date, DayOfWeek, Hour, Points) VALUES(@user,@file,@busNumber,@busDriverID,@date,@dayOfWeek,@hour,@points)";
+                query = "INSERT INTO RouteTrackFiles(Login, File, Bus, BusDriverID, Date, DayOfWeek, Hour, Points, BusID) VALUES(@user,@file,@busNumber,@busDriverID,@date,@dayOfWeek,@hour,@points,@busID)";
 
 
                 MemoryStream stream = new MemoryStream();
@@ -239,6 +240,7 @@ namespace ZTMobile
                 command.Parameters.AddWithValue("@dayOfWeek", dayOfWeek);
                 command.Parameters.AddWithValue("@hour", hour);
                 command.Parameters.AddWithValue("@points", points);
+                command.Parameters.AddWithValue("@busID", busID);
                 command.ExecuteNonQuery();
                 command.Parameters.Clear();
                 result = true;
@@ -347,6 +349,128 @@ namespace ZTMobile
             return result;
         }
 
+        //Get all lines names from database
+        public static List<string> getAllLines()
+        {
+            MySqlConnection connection = new MySqlConnection("SERVER=s12.hekko.net.pl;PORT=3306;DATABASE=ztmobile_0;UID=ztmobile_0;PWD=admin123;");
+            MySqlCommand command;
+            MySqlDataReader receivedResponse;
+            string query;
+            List<string> allLines = new List<string>();
+            allLines.Add("Wybierz");
+            bool nextResult = true;
+            int counter = 0;
+
+            try
+            {
+                connection.Open();
+                query = "SELECT * FROM BusLines";
+
+                command = new MySqlCommand(query, connection);
+                receivedResponse = command.ExecuteReader();
+                if (receivedResponse.Read())
+                {
+                    while (nextResult)
+                    {
+                        allLines.Add(receivedResponse.GetString("Name"));
+                        nextResult = receivedResponse.Read();
+                        nextResult = receivedResponse.Read();
+                    }
+                    receivedResponse.Close();
+                }
+
+            }
+            catch (Exception ex)
+            {
+                allLines = null;
+            }
+            finally
+            {
+                connection.Close();
+            }
+            return allLines;
+        }
+        
+        //Get directions for current line
+        public static List<string> getDirections(string line)
+        {
+            MySqlConnection connection = new MySqlConnection("SERVER=s12.hekko.net.pl;PORT=3306;DATABASE=ztmobile_0;UID=ztmobile_0;PWD=admin123;");
+            MySqlCommand command;
+            MySqlDataReader receivedResponse;
+            string query;
+            List<string> allDirs = new List<string>();
+            allDirs.Add("Wybierz");
+            bool nextResult = true;
+            try
+            {
+                connection.Open();
+                query = "SELECT * FROM BusLines WHERE Name='" + line + "'";
+
+                command = new MySqlCommand(query, connection);
+                receivedResponse = command.ExecuteReader();
+                if (receivedResponse.Read())
+                {
+                    while (nextResult)
+                    {
+                        allDirs.Add(receivedResponse.GetString("Direction"));
+                        nextResult = receivedResponse.Read();
+                    }
+                    receivedResponse.Close();
+                }
+
+            }
+            catch (Exception ex)
+            {
+                allDirs = null;
+            }
+            finally
+            {
+                connection.Close();
+            }
+            return allDirs;
+        }
+
+        //Get line id from line name and direction
+        public static int getlineID(string line, string dir)
+        {
+            MySqlConnection connection = new MySqlConnection("SERVER=s12.hekko.net.pl;PORT=3306;DATABASE=ztmobile_0;UID=ztmobile_0;PWD=admin123;");
+            MySqlCommand command;
+            MySqlDataReader receivedResponse;
+            string query;
+            int lineID = -1;
+
+            bool nextResult = true;
+            try
+            {
+                connection.Open();
+                query = "SELECT * FROM BusLines WHERE Name='" + line + "' AND Direction='" + dir + "'";
+
+                command = new MySqlCommand(query, connection);
+                receivedResponse = command.ExecuteReader();
+                if (receivedResponse.Read())
+                {
+                    while (nextResult)
+                    {
+                        lineID = int.Parse(receivedResponse.GetString("ID"));
+                        nextResult = receivedResponse.Read();
+                    }
+                    receivedResponse.Close();
+                }
+
+            }
+            catch (Exception ex)
+            {
+                lineID = -1;
+            }
+            finally
+            {
+                connection.Close();
+            }
+
+            return lineID;
+        }
+
+
         //Password should be already encrypted by MD5
         public static Boolean LogOutUserFromDatabase(string userName)
         {
@@ -401,6 +525,7 @@ namespace ZTMobile
 
             return result;
         }
+
 
         public static Boolean AddPhotoDatabase(string userName, Bitmap photo)
         {
