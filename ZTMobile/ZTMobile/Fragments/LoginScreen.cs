@@ -97,6 +97,33 @@ namespace ZTMobile.Fragments
             thread.Start();
         }
 
+        public Boolean LoginFromFile()
+        {
+            List<string> userInfo;
+            string path = Android.OS.Environment.ExternalStorageDirectory.AbsolutePath;
+            string filePath = System.IO.Path.Combine(path, "ztmobile_user.txt");
+
+            if (FunctionsAndGlobals.CheckIfFileExists(filePath))
+            {
+                var lines = System.IO.File.ReadAllLines(filePath);
+                userInfo = new List<string>(lines);
+
+                if (userInfo[1] == "0")
+                {
+                    return false;
+                }
+            }
+            else
+            {
+                return false;
+            }
+            
+            FunctionsAndGlobals.userName = userInfo[0];
+            FunctionsAndGlobals.isUserLoggedIn = true;
+
+            return true;
+        }
+
         private void LoginRequest(string login, string password)
         {
             if (FunctionsAndGlobals.LogInUserToDatabase(login, FunctionsAndGlobals.EncryptStringToMD5(password)) == true)
@@ -105,6 +132,9 @@ namespace ZTMobile.Fragments
                 Activity.RunOnUiThread(() => { Toast.MakeText(Activity.ApplicationContext, Resource.String.signedIn, ToastLength.Short).Show(); });
                 FunctionsAndGlobals.userName = login;
                 FunctionsAndGlobals.isUserLoggedIn = true;
+
+                FunctionsAndGlobals.EditUserFile(true);
+
                 LoggedInSuccessfully();
             }
             else

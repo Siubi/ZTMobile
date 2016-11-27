@@ -11,7 +11,8 @@
   <string name="signedOut">Wylogowano</string>
   <string name="photoAddedSuccesfully">Dodano zdjęcie</string>
   <string name="error">Błąd</string>
-  <string name="emptyBusNumber">Wpisz numer pojazdu</string>
+  <string name="emptyBusNumber">Wybierz numer pojazdu</string>
+  <string name="emptyBusDirection">Wybierz kierunek jazdy</string>
   <string name="emptyBusDriverID">Wpisz numer kierowcy</string>
   <string name="gpsNotEnabled">GPS nie jest włączony</string>
   <string name="exitMessage">Wciśnij ponownie aby wyjść</string>
