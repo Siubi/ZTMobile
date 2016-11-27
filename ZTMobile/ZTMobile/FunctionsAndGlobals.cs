@@ -39,9 +39,10 @@ namespace ZTMobile
         public static long doubleBackButtonClickInterval_ms = 2000;
         public static int sendFileOptions = (int)SendFileOptions.Undefined;
         public static string busDriverId = "";
-
         private static int timeIntervalBetweenGPSDataSaves = 1000;
         private static String fileNameWithGPSData;
+
+        public static event Action sendingFileCompleted;
 
         public static string GetCurrentDateFromTheInternet(int dateFormat)
         {
@@ -227,9 +228,11 @@ namespace ZTMobile
                 {
                     result = SendFileToDatabase(userName, filePath, busNumber, dir, busDriverId, currentDateAndTime.ToString("yyyy-MM-dd HH:mm:ss"), GetDayOfWeek(currentDateAndTime), currentDateAndTime.ToString("HH:mm:ss"), pointsInThisSession);
                     userPoints += pointsInThisSession;
-                    SetUserPointsInDatabase(userName, userPoints);
+                    AddUserPointsInDatabase(userName, pointsInThisSession);
                     Action postScore = new Action(() => { pointsValueOnActionBar.Text = (userPoints).ToString(); });
                     h.Post(postScore);
+
+                    sendingFileCompleted();
                 }
             }
 
@@ -360,16 +363,20 @@ namespace ZTMobile
             string filePath = System.IO.Path.Combine(path, "ztmobile_user.txt");
             FileStream fcreate = System.IO.File.Open(filePath, FileMode.Create);
             StreamWriter stream = new StreamWriter(fcreate);
+            string textToCipher;
+            string encryptedstring;
 
             if (signIn)
             {
-                stream.WriteLine(userName);
-                stream.WriteLine("1");
+                textToCipher = "xAz" + "\n" + userName + "\n" + "1";
+                encryptedstring = StringCipher.Encrypt(textToCipher, "masloMaslane1");
+                stream.WriteLine(encryptedstring);
             }
             else
             {
-                stream.WriteLine(userName);
-                stream.WriteLine("0");
+                textToCipher = "xAz" + "\n" + userName + "\n" + "0";
+                encryptedstring = StringCipher.Encrypt(textToCipher, "masloMaslane1");
+                stream.WriteLine(encryptedstring);
             }
             
             stream.Close();
@@ -800,6 +807,64 @@ namespace ZTMobile
             }
 
             return data;
+        }
+
+        public static Boolean AddUserPointsInDatabase(string userName, int points)
+        {
+            MySqlConnection connection = new MySqlConnection("SERVER=s12.hekko.net.pl;PORT=3306;DATABASE=ztmobile_0;UID=ztmobile_0;PWD=admin123;");
+            MySqlCommand command;
+            MySqlDataReader receivedResponse;
+            string query;
+            string receivedLogin;
+            long receivedPoints;
+            Boolean result;
+
+            try
+            {
+                connection.Open();
+                query = "SELECT * FROM Users WHERE Login='" + userName + "'";
+
+                command = new MySqlCommand(query, connection);
+                receivedResponse = command.ExecuteReader();
+
+                if (receivedResponse.Read())
+                {
+                    receivedLogin = receivedResponse.GetString("Login");
+                    receivedPoints = receivedResponse.GetInt64("Points");
+                    receivedResponse.Close();
+
+                    if (userName == receivedLogin)
+                    {
+                        receivedPoints += points;
+
+                        query = "UPDATE Users SET Points='" + receivedPoints.ToString() + "' WHERE Login='" + userName + "'";
+                        command.CommandText = query;
+                        command.ExecuteNonQuery();
+                        result = true;
+                    }
+                    else
+                    {
+                        result = false;
+                    }
+                }
+                else
+                {
+                    //User does not exist
+                    result = false;
+                }
+
+
+            }
+            catch (Exception ex)
+            {
+                result = false;
+            }
+            finally
+             {
+                connection.Close();
+            }
+
+            return result;
         }
 
         public static Boolean SetUserPointsInDatabase(string userName, int points)

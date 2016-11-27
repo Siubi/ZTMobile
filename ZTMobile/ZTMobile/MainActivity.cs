@@ -95,6 +95,12 @@ namespace ZTMobile
             loginScreenFragment.LoggedInSuccessfully += LoginScreenFragment_LoggedInSuccessfully;
             accountScreenFragment.LoggedOutSuccessfully += AccountScreenFragment_LoggedOutSuccessfully;
             accountScreenFragment.ActivityCreatedSuccessfully += AccountScreenFragment_ActivityCreatedSuccessfully;
+            FunctionsAndGlobals.sendingFileCompleted += FunctionsAndGlobals_sendingFileCompleted;
+        }
+
+        private void FunctionsAndGlobals_sendingFileCompleted()
+        {
+            this.RunOnUiThread(() => { Toast.MakeText(this, Resource.String.fileSentMessage, ToastLength.Short).Show(); });
         }
 
         private void AccountScreenFragment_ActivityCreatedSuccessfully()
@@ -127,8 +133,7 @@ namespace ZTMobile
                 ShowFragment(accountScreenFragment);
             }
 
-            Thread thread = new Thread(() => GetAndSetUserPoints());
-            thread.Start();
+            GetAndSetUserPoints();
 
             this.RunOnUiThread(() => { accountScreenFragment.SetProgressBarVisibilityState(true); });
             Bitmap bitmapImage = FunctionsAndGlobals.GetUserPhotoFromDatabase(FunctionsAndGlobals.userName);

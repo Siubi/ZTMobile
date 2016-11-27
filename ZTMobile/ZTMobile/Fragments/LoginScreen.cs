@@ -99,16 +99,25 @@ namespace ZTMobile.Fragments
 
         public Boolean LoginFromFile()
         {
-            List<string> userInfo;
+            List<string> userInfo = new List<string>();
             string path = Android.OS.Environment.ExternalStorageDirectory.AbsolutePath;
             string filePath = System.IO.Path.Combine(path, "ztmobile_user.txt");
 
             if (FunctionsAndGlobals.CheckIfFileExists(filePath))
             {
-                var lines = System.IO.File.ReadAllLines(filePath);
-                userInfo = new List<string>(lines);
+                var lines = System.IO.File.ReadAllText(filePath);
 
-                if (userInfo[1] == "0")
+                try
+                {
+                    string decryptedstring = StringCipher.Decrypt(lines, "masloMaslane1");
+                    userInfo = decryptedstring.Split(new[] { "\n" }, StringSplitOptions.None).ToList();
+                }
+                catch(Exception ex)
+                {
+                    return false;
+                }
+
+                if (userInfo.Count != 3 || userInfo[0] != "xAz" || userInfo[2] == "0")
                 {
                     return false;
                 }
@@ -118,7 +127,7 @@ namespace ZTMobile.Fragments
                 return false;
             }
             
-            FunctionsAndGlobals.userName = userInfo[0];
+            FunctionsAndGlobals.userName = userInfo[1];
             FunctionsAndGlobals.isUserLoggedIn = true;
 
             return true;
