@@ -41,20 +41,22 @@ namespace ZTMobile.Fragments
             txtBusDir.Visibility = ViewStates.Invisible;
             var spinnerDir = view.FindViewById<Spinner>(Resource.Id.spinnerBusDir);
             spinnerDir.Visibility = ViewStates.Invisible;
+
+            txtBusDriverID.TextChanged += TxtBusDriverID_TextChanged;
             
             FunctionsAndGlobals.isTrackingEnabled = false;
-            
-       /*     txtBusNumber.KeyPress += (object sender, View.KeyEventArgs e) => {
-                e.Handled = false;
-                if (e.Event.Action == KeyEventActions.Down && e.KeyCode == Keycode.Enter)
-                {
-                    InputMethodManager manager = (InputMethodManager)Activity.GetSystemService(Context.InputMethodService);
-                    manager.HideSoftInputFromWindow(txtBusNumber.WindowToken, 0);
-                    e.Handled = true;
-                }
-            };
-            */
-            List<String> lines = FunctionsAndGlobals.getAllLines();
+
+            /*     txtBusNumber.KeyPress += (object sender, View.KeyEventArgs e) => {
+                     e.Handled = false;
+                     if (e.Event.Action == KeyEventActions.Down && e.KeyCode == Keycode.Enter)
+                     {
+                         InputMethodManager manager = (InputMethodManager)Activity.GetSystemService(Context.InputMethodService);
+                         manager.HideSoftInputFromWindow(txtBusNumber.WindowToken, 0);
+                         e.Handled = true;
+                     }
+                 };
+                 */
+            List<String> lines = FunctionsAndGlobals.GetAllLines();
             var adapter = new ArrayAdapter<String>(Activity.ApplicationContext, Android.Resource.Layout.SimpleSpinnerItem, lines);
             adapter.SetDropDownViewResource(Android.Resource.Layout.SimpleSpinnerDropDownItem);
             var spinner = view.FindViewById<Spinner>(Resource.Id.spinnerBusNumber);
@@ -100,13 +102,24 @@ namespace ZTMobile.Fragments
             return view;
         }
 
+        private void TxtBusDriverID_TextChanged(object sender, Android.Text.TextChangedEventArgs e)
+        {
+            FunctionsAndGlobals.busDriverId = txtBusDriverID.Text;
+        }
+
         private void ButtonTrackingTrace_Click(object sender, EventArgs e)
         {
             if (FunctionsAndGlobals.isTrackingEnabled == false)
             {
-                if (lineName == emptyField || dirName == emptyField)
+                if (lineName == emptyField)
                 {
                     Activity.RunOnUiThread(() => { Toast.MakeText(Activity.ApplicationContext, Resource.String.emptyBusNumber, ToastLength.Short).Show(); });
+                    return;
+                }
+
+                if (dirName == emptyField)
+                {
+                    Activity.RunOnUiThread(() => { Toast.MakeText(Activity.ApplicationContext, Resource.String.emptyBusDirection, ToastLength.Short).Show(); });
                     return;
                 }
 
@@ -128,9 +141,9 @@ namespace ZTMobile.Fragments
                 FunctionsAndGlobals.isTrackingEnabled = true;
                 FunctionsAndGlobals.googleMap.MyLocationEnabled = true;
                 
-                txtBusDriverID.Focusable = false;
-                txtBusDriverID.FocusableInTouchMode = false;
-                txtBusDriverID.Enabled = false;
+                //txtBusDriverID.Focusable = false;
+                //txtBusDriverID.FocusableInTouchMode = false;
+                //txtBusDriverID.Enabled = false;
                 Thread thread = new Thread(() => FunctionsAndGlobals.SaveAndSendGPSDataToFile(lineName, dirName, txtBusDriverID.Text));
                 thread.Start();
             }
@@ -141,11 +154,38 @@ namespace ZTMobile.Fragments
                 FunctionsAndGlobals.isTrackingEnabled = false;
                 FunctionsAndGlobals.googleMap.MyLocationEnabled = false;
                 FunctionsAndGlobals.googleMap.Clear();
-                
-                txtBusDriverID.Focusable = true;
-                txtBusDriverID.FocusableInTouchMode = true;
-                txtBusDriverID.Enabled = true;
+
+                FunctionsAndGlobals.busDriverId = "";
+
+                //txtBusDriverID.Focusable = true;
+                //txtBusDriverID.FocusableInTouchMode = true;
+                //txtBusDriverID.Enabled = true;
+
+                FileSendConfirmAlert();
             }
+
+        }
+
+        private void FileSendConfirmAlert()
+        {
+            AlertDialog.Builder alert = new AlertDialog.Builder(Context);
+            alert.SetTitle("PotwierdŸ poprawnoœæ danych");
+            alert.SetMessage("Czy chcesz wys³aæ plik?");
+            alert.SetPositiveButton("Tak", (senderAlert, args) => {
+                FunctionsAndGlobals.sendFileOptions = (int)FunctionsAndGlobals.SendFileOptions.Send;
+            });
+            alert.SetNegativeButton("Nie", (senderAlert, args) => {
+                FunctionsAndGlobals.sendFileOptions = (int)FunctionsAndGlobals.SendFileOptions.DoNotSend;
+            });
+
+            Dialog dialog = alert.Create();
+            dialog.Show();
+            dialog.CancelEvent += Dialog_CancelEvent;
+        }
+
+        private void Dialog_CancelEvent(object sender, EventArgs e)
+        {
+            FunctionsAndGlobals.sendFileOptions = (int)FunctionsAndGlobals.SendFileOptions.DoNotSend;
         }
     }
 }

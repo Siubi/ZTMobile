@@ -25,6 +25,7 @@ namespace ZTMobile.Fragments
         private ImageButton buttonUserImage;
 
         public event Action LoggedOutSuccessfully;
+        public event Action ActivityCreatedSuccessfully;
 
         public override void OnCreate(Bundle savedInstanceState)
         {
@@ -54,6 +55,7 @@ namespace ZTMobile.Fragments
                     Intent.CreateChooser(imageIntent, "Select photo"), 0);
             };
 
+            ActivityCreatedSuccessfully();
             return view;
         }
 
@@ -99,6 +101,9 @@ namespace ZTMobile.Fragments
                 FunctionsAndGlobals.userName = "";
                 FunctionsAndGlobals.userPoints = 0;
                 Activity.RunOnUiThread(() => { buttonUserImage.SetImageBitmap(BitmapFactory.DecodeResource(Resources, Resource.Drawable.plus)); });
+
+                FunctionsAndGlobals.EditUserFile(false);
+
                 LoggedOutSuccessfully();
             }
             else

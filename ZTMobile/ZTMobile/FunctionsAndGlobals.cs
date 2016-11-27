@@ -26,6 +26,7 @@ namespace ZTMobile
     public class FunctionsAndGlobals
     {
         enum DateFormats { Date, Time, DateAndTime }
+        public enum SendFileOptions { Send, DoNotSend, Undefined}
 
         public static TextView pointsTextOnActionBar;
         public static TextView pointsValueOnActionBar;
@@ -36,6 +37,8 @@ namespace ZTMobile
         public static bool isTrackingEnabled = false;
         public static bool isUserLoggedIn = false;
         public static long doubleBackButtonClickInterval_ms = 2000;
+        public static int sendFileOptions = (int)SendFileOptions.Undefined;
+        public static string busDriverId = "";
 
         private static int timeIntervalBetweenGPSDataSaves = 1000;
         private static String fileNameWithGPSData;
@@ -156,7 +159,7 @@ namespace ZTMobile
         {
             int pointsInThisSession = 0;
             DateTime currentDateAndTime = GetCurrentDateFromTheInternet();
-            String header = "<Numer autobusu=" + busNumber + " Identyfikator kierowcy=" + busDriverID + " Data=" + currentDateAndTime + " Interwa³ czasowy(ms)=" + timeIntervalBetweenGPSDataSaves.ToString() + ">";
+            String header = "<Numer autobusu=" + busNumber + " Identyfikator kierowcy=" + busDriverId + " Data=" + currentDateAndTime + " Interwa³ czasowy(ms)=" + timeIntervalBetweenGPSDataSaves.ToString() + ">";
             DateTime localTimeOfFirstSave = DateTime.Now;
             TimeSpan timeInterval;
             Handler h = new Handler(Looper.MainLooper);
@@ -197,19 +200,42 @@ namespace ZTMobile
             string path = Android.OS.Environment.ExternalStorageDirectory.AbsolutePath;
             string filePath = System.IO.Path.Combine(path, fileNameWithGPSData);
 
+            while (true)
+            {
+                if (sendFileOptions == (int)SendFileOptions.Send)
+                {
+                    sendFileOptions = (int)SendFileOptions.Undefined;
+                    break;
+                }
+                if (sendFileOptions == (int)SendFileOptions.DoNotSend)
+                {
+                    sendFileOptions = (int)SendFileOptions.Undefined;
+                    if (System.IO.File.Exists(filePath))
+                    {
+                        System.IO.File.Delete(filePath);
+                    }
+                    return;
+                }
+            }
+
             bool result = false;
             while (!result)
             {
                 if (userName == "")
-                    result = SendFileToDatabase(guestID, filePath, busNumber, dir, busDriverID, currentDateAndTime.ToString("yyyy-MM-dd HH:mm:ss"), GetDayOfWeek(currentDateAndTime), currentDateAndTime.ToString("HH:mm:ss"), 0);
+                    result = SendFileToDatabase(guestID, filePath, busNumber, dir, busDriverId, currentDateAndTime.ToString("yyyy-MM-dd HH:mm:ss"), GetDayOfWeek(currentDateAndTime), currentDateAndTime.ToString("HH:mm:ss"), 0);
                 else
                 {
-                    result = SendFileToDatabase(userName, filePath, busNumber, dir, busDriverID, currentDateAndTime.ToString("yyyy-MM-dd HH:mm:ss"), GetDayOfWeek(currentDateAndTime), currentDateAndTime.ToString("HH:mm:ss"), pointsInThisSession);
+                    result = SendFileToDatabase(userName, filePath, busNumber, dir, busDriverId, currentDateAndTime.ToString("yyyy-MM-dd HH:mm:ss"), GetDayOfWeek(currentDateAndTime), currentDateAndTime.ToString("HH:mm:ss"), pointsInThisSession);
                     userPoints += pointsInThisSession;
                     SetUserPointsInDatabase(userName, userPoints);
                     Action postScore = new Action(() => { pointsValueOnActionBar.Text = (userPoints).ToString(); });
                     h.Post(postScore);
                 }
+            }
+
+            if (System.IO.File.Exists(filePath))
+            {
+                System.IO.File.Delete(filePath);
             }
         }
 
@@ -292,6 +318,63 @@ namespace ZTMobile
             return result;
         }
 
+        public static Boolean CheckIfFileExists(string fileName)
+        {
+            string path = Android.OS.Environment.ExternalStorageDirectory.AbsolutePath;
+            string filePath = System.IO.Path.Combine(path, fileName);
+
+            if(System.IO.File.Exists(filePath))
+            {
+                return true;
+            }
+            return false;
+        }
+
+        public static List<string> GetAllLines()
+        {
+            List<string> listWithBusLines;
+            string path = Android.OS.Environment.ExternalStorageDirectory.AbsolutePath;
+            string filePath = System.IO.Path.Combine(path, "ztmobile_busLines.txt");
+
+            if (CheckIfFileExists(filePath))
+            {
+                var lines = System.IO.File.ReadAllLines(filePath);
+                listWithBusLines = new List<string>(lines);
+                return listWithBusLines;
+            }
+
+            listWithBusLines = new List<string>();
+            listWithBusLines = getAllLinesFromDatabase();
+            using (TextWriter tw = new StreamWriter(filePath))
+            {
+                foreach (String s in listWithBusLines)
+                    tw.WriteLine(s);
+            }
+
+            return listWithBusLines;
+        }
+
+        public static void EditUserFile(bool signIn)
+        {
+            string path = Android.OS.Environment.ExternalStorageDirectory.AbsolutePath;
+            string filePath = System.IO.Path.Combine(path, "ztmobile_user.txt");
+            FileStream fcreate = System.IO.File.Open(filePath, FileMode.Create);
+            StreamWriter stream = new StreamWriter(fcreate);
+
+            if (signIn)
+            {
+                stream.WriteLine(userName);
+                stream.WriteLine("1");
+            }
+            else
+            {
+                stream.WriteLine(userName);
+                stream.WriteLine("0");
+            }
+            
+            stream.Close();
+        }
+
         //Password should be already encrypted by MD5
         public static Boolean LogInUserToDatabase(string userName, string password)
         {
@@ -350,7 +433,7 @@ namespace ZTMobile
         }
 
         //Get all lines names from database
-        public static List<string> getAllLines()
+        public static List<string> getAllLinesFromDatabase()
         {
             MySqlConnection connection = new MySqlConnection("SERVER=s12.hekko.net.pl;PORT=3306;DATABASE=ztmobile_0;UID=ztmobile_0;PWD=admin123;");
             MySqlCommand command;

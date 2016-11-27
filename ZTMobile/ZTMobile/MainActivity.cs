@@ -34,6 +34,7 @@ namespace ZTMobile
         private AccountScreen accountScreenFragment;
         private RankingScreen rankingScreenFragment;
         private DateTime lastBackButtonClickTime;
+        private static bool pointOnActionBarLoaded = false;
 
         List<String> leftMenuItems = new List<String>();
         ArrayAdapter leftMenuArrayAdapter;
@@ -93,6 +94,20 @@ namespace ZTMobile
             leftDrawer.ItemClick += LeftDrawer_ItemClick;
             loginScreenFragment.LoggedInSuccessfully += LoginScreenFragment_LoggedInSuccessfully;
             accountScreenFragment.LoggedOutSuccessfully += AccountScreenFragment_LoggedOutSuccessfully;
+            accountScreenFragment.ActivityCreatedSuccessfully += AccountScreenFragment_ActivityCreatedSuccessfully;
+        }
+
+        private void AccountScreenFragment_ActivityCreatedSuccessfully()
+        {
+            Thread thread = new Thread(() =>
+                {
+                    if (loginScreenFragment.LoginFromFile())
+                    {
+                        LoginScreenFragment_LoggedInSuccessfully();
+                    }
+                }
+            );
+            thread.Start();
         }
 
         private void PointsValueOnActionBar_TextChanged(object sender, Android.Text.TextChangedEventArgs e)
@@ -151,6 +166,8 @@ namespace ZTMobile
             }
 
             FunctionsAndGlobals.userPoints = result;
+
+            while (!pointOnActionBarLoaded) { }
 
             this.RunOnUiThread(() => { FunctionsAndGlobals.pointsTextOnActionBar.Text = "Punkty:"; });
             this.RunOnUiThread(() => { FunctionsAndGlobals.pointsValueOnActionBar.Text = FunctionsAndGlobals.userPoints.ToString(); });
@@ -226,6 +243,7 @@ namespace ZTMobile
             
             FunctionsAndGlobals.pointsValueOnActionBar.TextChanged += PointsValueOnActionBar_TextChanged;
 
+            pointOnActionBarLoaded = true;
             return base.OnCreateOptionsMenu(menu);
         }
 
