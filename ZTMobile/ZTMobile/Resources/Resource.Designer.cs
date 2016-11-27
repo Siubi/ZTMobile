@@ -2630,7 +2630,10 @@ namespace ZTMobile
 			public const int exitMessage = 2131165252;
 			
 			// aapt resource value: 0x7f070045
-			public const int google_maps_key = 2131165253;
+			public const int fileSentMessage = 2131165253;
+			
+			// aapt resource value: 0x7f070046
+			public const int google_maps_key = 2131165254;
 			
 			// aapt resource value: 0x7f070043
 			public const int gpsNotEnabled = 2131165251;

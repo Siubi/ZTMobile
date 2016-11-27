@@ -170,7 +170,7 @@ namespace ZTMobile.Fragments
         {
             AlertDialog.Builder alert = new AlertDialog.Builder(Context);
             alert.SetTitle("PotwierdŸ poprawnoœæ danych");
-            alert.SetMessage("Czy chcesz wys³aæ plik?");
+            alert.SetMessage("Czy chcesz wys³aæ zebrane dane o trasie przejazdu?");
             alert.SetPositiveButton("Tak", (senderAlert, args) => {
                 FunctionsAndGlobals.sendFileOptions = (int)FunctionsAndGlobals.SendFileOptions.Send;
             });
