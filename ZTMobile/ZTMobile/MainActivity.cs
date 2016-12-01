@@ -20,7 +20,7 @@ using Android.Views.Animations;
 
 namespace ZTMobile
 {
-    [Activity(Label = "ZTMobile", MainLauncher = true, Icon = "@drawable/icon", Theme = "@style/MainTheme", ScreenOrientation = Android.Content.PM.ScreenOrientation.Portrait)]
+    [Activity(Label = "ZTMobile", MainLauncher = true, Icon = "@drawable/ic_launcher", Theme = "@style/MainTheme", ScreenOrientation = Android.Content.PM.ScreenOrientation.Portrait)]
     public class MainActivity : ActionBarActivity
     {
         private SupportToolbar toolbar;
