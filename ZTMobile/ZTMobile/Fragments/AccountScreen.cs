@@ -35,7 +35,7 @@ namespace ZTMobile.Fragments
         public override View OnCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
         {
             View view = inflater.Inflate(Resource.Layout.AccountScreenLayout, container, false);
-
+            
             progressBar = view.FindViewById<ProgressBar>(Resource.Id.progressBarLogOut);
             txtUserName = view.FindViewById<TextView>(Resource.Id.txtUserName);
             txtPoints = view.FindViewById<TextView>(Resource.Id.txtPoints);
@@ -45,7 +45,7 @@ namespace ZTMobile.Fragments
             buttonUserImage.SetImageBitmap(BitmapFactory.DecodeResource(Resources, Resource.Drawable.plus));
 
             buttonSignOut.Click += ButtonSignOut_Click;
-
+            
             buttonUserImage.Click += delegate {
 
                 var imageIntent = new Intent();
