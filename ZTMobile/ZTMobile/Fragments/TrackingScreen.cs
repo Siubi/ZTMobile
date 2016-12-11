@@ -13,6 +13,8 @@ using Android.Widget;
 using System.Threading;
 using Android.Locations;
 using Android.Views.InputMethods;
+using Android;
+using Android.Content.PM;
 
 namespace ZTMobile.Fragments
 {
@@ -56,8 +58,9 @@ namespace ZTMobile.Fragments
                      }
                  };
                  */
+
             List<String> lines = FunctionsAndGlobals.GetAllLines();
-            var adapter = new ArrayAdapter<String>(Activity.ApplicationContext, Android.Resource.Layout.SimpleSpinnerItem, lines);
+            var adapter = new ArrayAdapter<String>(Activity, Resource.Layout.spinnerLayout, lines);
             adapter.SetDropDownViewResource(Android.Resource.Layout.SimpleSpinnerDropDownItem);
             var spinner = view.FindViewById<Spinner>(Resource.Id.spinnerBusNumber);
             spinner.Adapter = adapter;
@@ -68,7 +71,7 @@ namespace ZTMobile.Fragments
                 if (lineName != emptyField)
                 {
                     List<String> dirs = FunctionsAndGlobals.getDirections((String)s.GetItemAtPosition(e.Position));
-                    var adapterDirs = new ArrayAdapter<String>(Activity.ApplicationContext, Android.Resource.Layout.SimpleSpinnerItem, dirs);
+                    var adapterDirs = new ArrayAdapter<String>(Activity, Resource.Layout.spinnerLayout, dirs);
                     adapterDirs.SetDropDownViewResource(Android.Resource.Layout.SimpleSpinnerDropDownItem);
                     spinnerDir.Adapter = adapterDirs;
                     spinnerDir.Visibility = ViewStates.Visible;
@@ -187,5 +190,6 @@ namespace ZTMobile.Fragments
         {
             FunctionsAndGlobals.sendFileOptions = (int)FunctionsAndGlobals.SendFileOptions.DoNotSend;
         }
+
     }
 }

@@ -2440,10 +2440,13 @@ namespace ZTMobile
 			public const int select_dialog_singlechoice_material = 2130903086;
 			
 			// aapt resource value: 0x7f03002f
-			public const int support_simple_spinner_dropdown_item = 2130903087;
+			public const int spinnerLayout = 2130903087;
 			
 			// aapt resource value: 0x7f030030
-			public const int TrackingScreenLayout = 2130903088;
+			public const int support_simple_spinner_dropdown_item = 2130903088;
+			
+			// aapt resource value: 0x7f030031
+			public const int TrackingScreenLayout = 2130903089;
 			
 			static Layout()
 			{
@@ -2635,14 +2638,23 @@ namespace ZTMobile
 			// aapt resource value: 0x7f070045
 			public const int fileSentMessage = 2131165253;
 			
-			// aapt resource value: 0x7f070046
-			public const int google_maps_key = 2131165254;
+			// aapt resource value: 0x7f070049
+			public const int google_maps_key = 2131165257;
 			
 			// aapt resource value: 0x7f070043
 			public const int gpsNotEnabled = 2131165251;
 			
+			// aapt resource value: 0x7f070046
+			public const int loginTooLong = 2131165254;
+			
 			// aapt resource value: 0x7f070037
 			public const int openDrawer = 2131165239;
+			
+			// aapt resource value: 0x7f070047
+			public const int passwordTooShort = 2131165255;
+			
+			// aapt resource value: 0x7f070048
+			public const int passwordsMismatch = 2131165256;
 			
 			// aapt resource value: 0x7f07003e
 			public const int photoAddedSuccesfully = 2131165246;

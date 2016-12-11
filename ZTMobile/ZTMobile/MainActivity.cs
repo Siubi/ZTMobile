@@ -17,11 +17,17 @@ using Android.Gms.Maps;
 using Android.Graphics;
 using System.IO;
 using Android.Views.Animations;
+using System.Threading.Tasks;
+using Android;
+using Android.Content.PM;
+using Android.Support.V4.App;
+using Plugin.Permissions;
+using Android.Support.V4.Content;
 
 namespace ZTMobile
 {
     [Activity(Label = "ZTMobile", MainLauncher = true, Icon = "@drawable/ic_launcher", Theme = "@style/MainTheme", ScreenOrientation = Android.Content.PM.ScreenOrientation.Portrait)]
-    public class MainActivity : ActionBarActivity
+    public class MainActivity : ActionBarActivity, ActivityCompat.IOnRequestPermissionsResultCallback
     {
         private SupportToolbar toolbar;
         private ActionBarDrawerToggle drawerToggle;
@@ -43,13 +49,16 @@ namespace ZTMobile
         {
             base.OnCreate(bundle);
 
-            lastBackButtonClickTime = DateTime.Now;
-
             // Set our view from the "main" layout resource
             SetContentView(Resource.Layout.Main);
 
             lastBackButtonClickTime = DateTime.Now;
 
+            CheckLocationPermission();
+        }
+
+        private void Initialize()
+        {
             toolbar = FindViewById<SupportToolbar>(Resource.Id.toolbar);
             drawerLayout = FindViewById<DrawerLayout>(Resource.Id.drawer_layout);
             leftDrawer = FindViewById<ListView>(Resource.Id.left_drawer);
@@ -79,7 +88,8 @@ namespace ZTMobile
             transaction.Add(Resource.Id.fragmentContainer, loginScreenFragment, "Login Screen");
             transaction.Hide(loginScreenFragment);
             transaction.Add(Resource.Id.fragmentContainer, trackingScreenFragment, "Tracking Screen");
-            transaction.Commit();
+            transaction.SetCustomAnimations(Android.Resource.Animation.FadeOut, Android.Resource.Animation.FadeIn);
+            transaction.CommitAllowingStateLoss();
 
             currentFragment = trackingScreenFragment;
 
@@ -245,7 +255,7 @@ namespace ZTMobile
             menu.Add(0, 1, 2, Resource.String.error).SetActionView(pointsValueOnActionBar).SetShowAsAction(ShowAsAction.Always);
             pointsValueOnActionBar.Text = "";
             FunctionsAndGlobals.pointsValueOnActionBar = pointsValueOnActionBar;
-            
+
             FunctionsAndGlobals.pointsValueOnActionBar.TextChanged += PointsValueOnActionBar_TextChanged;
 
             pointOnActionBarLoaded = true;
@@ -268,11 +278,44 @@ namespace ZTMobile
         {
             var transaction = SupportFragmentManager.BeginTransaction();
             transaction.Hide(currentFragment);
+            transaction.SetCustomAnimations(Android.Resource.Animation.SlideInLeft, Android.Resource.Animation.SlideOutRight);
             transaction.Show(fragment);
             transaction.AddToBackStack(null);
             transaction.Commit();
 
             currentFragment = fragment;
+        }
+
+        private void CheckLocationPermission()
+        {
+            if (ContextCompat.CheckSelfPermission(this, Manifest.Permission.AccessFineLocation) == (int)Android.Content.PM.Permission.Granted)
+            {
+                Initialize();
+                return;
+            }
+
+            ActivityCompat.RequestPermissions(this, new String[] { Manifest.Permission.AccessFineLocation }, 1);
+        }
+
+        public override async void OnRequestPermissionsResult(int requestCode, string[] permissions, [GeneratedEnum] Permission[] grantResults)
+        {
+            switch (requestCode)
+            {
+                case 1:
+                    {
+                        // If request is cancelled, the result arrays are empty.
+                        if (grantResults.Length > 0 && grantResults[0] == Permission.Granted)
+                        {
+                            Initialize();
+                            return;
+                        }
+                        else
+                        {
+                            Java.Lang.JavaSystem.Exit(0);
+                        }
+                        break;
+                    }
+            }
         }
     }
 }
