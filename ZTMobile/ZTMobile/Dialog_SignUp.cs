@@ -77,6 +77,22 @@ namespace ZTMobile
 
         private void ButtonSignUp_Click(object sender, EventArgs e)
         {
+            if (txtLogin.Length() > 10)
+            {
+                Activity.RunOnUiThread(() => { Toast.MakeText(Activity.ApplicationContext, Resource.String.loginTooLong, ToastLength.Short).Show(); });
+                return;
+            }
+            if (txtPassword.Length() < 6)
+            {
+                Activity.RunOnUiThread(() => { Toast.MakeText(Activity.ApplicationContext, Resource.String.passwordTooShort, ToastLength.Short).Show(); });
+                return;
+            }
+            if (txtPassword.Text != txtPasswordConfirm.Text)
+            {
+                Activity.RunOnUiThread(() => { Toast.MakeText(Activity.ApplicationContext, Resource.String.passwordsMismatch, ToastLength.Short).Show(); });
+                return;
+            }
+
             mOnSignUpComplete.Invoke(this, new OnSignUpEventArgs(txtLogin.Text, txtEmail.Text, txtPassword.Text, txtPasswordConfirm.Text));
             this.Dismiss();
         }
